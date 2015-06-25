@@ -445,13 +445,13 @@ class PecanBase(object):
         if self.guess_content_type_from_ext \
                 and not pecan_state['content_type'] \
                 and '.' in path:
-            new_path, extension = splitext(path)
+            _, extension = splitext(path.rstrip('/'))
 
             # preface with a letter to ensure compat for 2.5
             potential_type = guess_type('x' + extension)[0]
 
-            if potential_type is not None:
-                path = new_path
+            if extension and potential_type is not None:
+                path = ''.join(path.rsplit(extension, 1))
                 pecan_state['extension'] = extension
                 pecan_state['content_type'] = potential_type
 

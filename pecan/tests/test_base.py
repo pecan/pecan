@@ -1401,24 +1401,28 @@ class TestFileTypeExtensions(PecanTestCase):
         return TestApp(Pecan(RootController()))
 
     def test_html_extension(self):
-        r = self.app_.get('/index.html')
-        assert r.status_int == 200
-        assert r.body == b_('.html')
+        for path in ('/index.html', '/index.html/'):
+            r = self.app_.get(path)
+            assert r.status_int == 200
+            assert r.body == b_('.html')
 
     def test_image_extension(self):
-        r = self.app_.get('/image.png')
-        assert r.status_int == 200
-        assert r.body == b_('.png')
+        for path in ('/index.png', '/index.png/'):
+            r = self.app_.get(path)
+            assert r.status_int == 200
+            assert r.body == b_('.png')
 
     def test_hidden_file(self):
-        r = self.app_.get('/.vimrc')
-        assert r.status_int == 204
-        assert r.body == b_('')
+        for path in ('/.vimrc', '/.vimrc/'):
+            r = self.app_.get(path)
+            assert r.status_int == 204
+            assert r.body == b_('')
 
     def test_multi_dot_extension(self):
-        r = self.app_.get('/gradient.min.js')
-        assert r.status_int == 200
-        assert r.body == b_('.js')
+        for path in ('/gradient.min.js', '/gradient.min.js/'):
+            r = self.app_.get(path)
+            assert r.status_int == 200
+            assert r.body == b_('.js')
 
     def test_bad_content_type(self):
         class RootController(object):
@@ -1468,6 +1472,39 @@ class TestFileTypeExtensions(PecanTestCase):
         r = app.get('/index.html')
         assert r.status_int == 200
         assert r.body == b_('SOME VALUE')
+
+    def test_content_type_guessing_disabled(self):
+
+        class ResourceController(object):
+
+            def __init__(self, name):
+                self.name = name
+                assert self.name == 'file.html'
+
+            @expose('json')
+            def index(self):
+                return dict(name=self.name)
+
+        class RootController(object):
+
+            @expose()
+            def _lookup(self, name, *remainder):
+                return ResourceController(name), remainder
+
+        app = TestApp(
+            Pecan(RootController(), guess_content_type_from_ext=False)
+        )
+
+        r = app.get('/file.html/')
+        assert r.status_int == 200
+        result = dict(json.loads(r.body.decode()))
+        assert result == {'name': 'file.html'}
+
+        r = app.get('/file.html')
+        assert r.status_int == 302
+        r = r.follow()
+        result = dict(json.loads(r.body.decode()))
+        assert result == {'name': 'file.html'}
 
 
 class TestContentTypeByAcceptHeaders(PecanTestCase):
