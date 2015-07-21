@@ -113,7 +113,7 @@ def override_template(template, content_type=None):
         request.pecan['override_content_type'] = content_type
 
 
-def abort(status_code=None, detail='', headers=None, comment=None, **kw):
+def abort(status_code, detail='', headers=None, comment=None, **kw):
     '''
     Raise an HTTP status code, as specified. Useful for returning status
     codes like 401 Unauthorized or 403 Forbidden.
