@@ -47,7 +47,6 @@ class Config(object):
     '''
 
     def __init__(self, conf_dict={}, filename=''):
-
         self.__values__ = {}
         self.__file__ = filename
         self.update(conf_dict)
@@ -115,6 +114,12 @@ class Config(object):
         except KeyError:
             msg = "'pecan.conf' object has no attribute '%s'" % name
             raise AttributeError(msg)
+
+    def __setattr__(self, key, value):
+        if key not in ('__values__', '__file__'):
+            self.__setitem__(key, value)
+            return
+        super(Config, self).__setattr__(key, value)
 
     def __getitem__(self, key):
         return self.__values__[key]
