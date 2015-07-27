@@ -56,6 +56,10 @@ class ServeCommand(BaseCommand):
         parent = self
 
         class AggressiveEventHandler(FileSystemEventHandler):
+
+            def __init__(self):
+                self.wait = False
+
             def should_reload(self, event):
                 for t in (
                     FileSystemMovedEvent, FileModifiedEvent, DirModifiedEvent
@@ -64,9 +68,24 @@ class ServeCommand(BaseCommand):
                         return True
                 return False
 
+            def ignore_events_one_sec(self):
+                if not self.wait:
+                    self.wait = True
+                    t = threading.Thread(target=self.wait_one_sec)
+                    t.start()
+
+            def wait_one_sec(self):
+                time.sleep(1)
+                self.wait = False
+
             def on_modified(self, event):
-                if self.should_reload(event):
+                if self.should_reload(event) and not self.wait:
+                    print("Some source files have been modified",
+                          file=sys.stderr)
+                    print("Restarting server...",
+                          file=sys.stderr)
                     parent.server_process.kill()
+                    self.ignore_events_one_sec()
                     parent.create_subprocess()
 
         # Determine a list of file paths to monitor
