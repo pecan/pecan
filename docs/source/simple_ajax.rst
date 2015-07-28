@@ -220,7 +220,7 @@ Add the following code to the ``projects.py`` file:
                         documentation='http://docs.openstack.org'),
                 Project(name='Pecan',
                         licensing='BSD',
-                        repository='http://github.com/stackforge/pecan',
+                        repository='http://github.com/pecan/pecan',
                         documentation='http://pecan.readthedocs.org'),
                 Project(name='stevedore',
                         licensing='Apache 2',
