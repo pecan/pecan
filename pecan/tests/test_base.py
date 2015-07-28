@@ -7,7 +7,7 @@ import traceback
 import warnings
 
 import webob
-from webob.exc import HTTPNotFound
+from webob import exc
 import mock
 from webtest import TestApp
 import six
@@ -1074,7 +1074,7 @@ class TestDefaultErrorRendering(PecanTestCase):
         r = app.get('/', status=404)
         assert r.status_int == 404
         assert r.content_type == 'text/plain'
-        assert r.body == b_(HTTPNotFound().plain_body({}))
+        assert r.body == b_(exc.HTTPNotFound().plain_body({}))
 
     def test_html_error(self):
         class RootController(object):
@@ -1084,7 +1084,7 @@ class TestDefaultErrorRendering(PecanTestCase):
         r = app.get('/', headers={'Accept': 'text/html'}, status=404)
         assert r.status_int == 404
         assert r.content_type == 'text/html'
-        assert r.body == b_(HTTPNotFound().html_body({}))
+        assert r.body == b_(exc.HTTPNotFound().html_body({}))
 
     def test_json_error(self):
         class RootController(object):
@@ -1133,8 +1133,21 @@ class TestAbort(PecanTestCase):
         except Exception:
             last_exc, _, last_traceback = sys.exc_info()
 
-        assert last_exc is HTTPNotFound
+        assert last_exc is exc.HTTPNotFound
         assert 'Bottom Exception' in traceback.format_tb(last_traceback)[-1]
+
+    def test_abort_is_deterministic(self):
+        for code, cls in (
+            (200, exc.HTTPOk),
+            (201, exc.HTTPCreated),
+            (300, exc.HTTPMultipleChoices),
+            (302, exc.HTTPFound),
+            (400, exc.HTTPBadRequest),
+            (404, exc.HTTPNotFound),
+            (500, exc.HTTPInternalServerError),
+            (501, exc.HTTPNotImplemented)
+        ):
+            self.assertRaises(cls, abort, code)
 
 
 class TestScriptName(PecanTestCase):

@@ -1,6 +1,6 @@
 from .core import (
     abort, override_template, Pecan, Request, Response, load_app,
-    redirect, render, request, response
+    redirect, render, request, response, status_map
 )
 from .decorators import expose
 from .hooks import RequestViewerHook
@@ -26,7 +26,7 @@ import warnings
 __all__ = [
     'make_app', 'load_app', 'Pecan', 'Request', 'Response', 'request',
     'response', 'override_template', 'expose', 'conf', 'set_config', 'render',
-    'abort', 'redirect', 'route'
+    'abort', 'redirect', 'route', 'status_map'
 ]
 
 
