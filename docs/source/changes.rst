@@ -1,3 +1,17 @@
+1.0.0
+=====
+* Replaced pecan's debugger middleware with an (optional) dependency on the
+  `backlash` package.  Developers who want to debug application-level
+  tracebacks interactively should `pip install backlash` in their development
+  environment.
+* Fixed a Content-Type related bug: when an explicit content_type is specified
+  as an argument to `pecan.expose()`, it is now given precedence over the
+  application-level default renderer.
+* Fixed a bug that prevented the usage of certain RFC3986-specified characters
+  in path segments.
+* Fixed a bug in `pecan.abort` which suppressed the original traceback (and
+  prevented monitoring tools like NewRelic from working as effectively).
+
 0.9.0
 =====
 * Support for Python 3.2 has been dropped.
