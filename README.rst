@@ -48,9 +48,9 @@ Contributing
 For information on contributing to Pecan, please read our `Contributing
 Guidelines <https://github.com/pecan/pecan/blob/master/CONTRIBUTING.rst>`_.
 
-Bugs should be filed on Launchpad, not GitHub:
+Bugs should be reported at:
 
-https://bugs.launchpad.net/pecan
+https://github.com/pecan/pecan/issues/new
 
 Additional Help/Support
 -----------------------
