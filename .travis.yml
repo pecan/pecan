@@ -1,4 +1,5 @@
 language: python
+cache: pip
 services:
   - mongodb
 
@@ -39,3 +40,13 @@ install:
 
 script:
   - travis_wait tox
+
+matrix:
+  allow_failures:
+    - env: TOXENV=barbican-stable
+    - env: TOXENV=ceilometer-stable
+    - env: TOXENV=designate-stable
+    - env: TOXENV=gnocchi-stable
+    - env: TOXENV=ironic-stable
+    - env: TOXENV=magnum-stable
+    - env: TOXENV=wsme-stable
