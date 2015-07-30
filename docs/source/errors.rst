@@ -69,8 +69,7 @@ add it to :class:`test_project.root.RootController` class
 
 ::
     
-    from pecan import expose
-    from webob.exc import status_map
+    from pecan import expose, status_map
 
 
     class RootController(object):

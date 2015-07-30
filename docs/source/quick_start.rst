@@ -199,8 +199,7 @@ can think of it as being analogous to your application's root URL path
 This is how it looks in the project template
 (``test_project.controllers.root.RootController``)::
 
-    from pecan import expose
-    from webob.exc import status_map
+    from pecan import expose, status_map
 
 
     class RootController(object):

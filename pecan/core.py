@@ -2,7 +2,7 @@ try:
     from simplejson import dumps, loads
 except ImportError:  # pragma: no cover
     from json import dumps, loads  # noqa
-from inspect import Arguments
+from inspect import Arguments, isclass
 from itertools import chain, tee
 from mimetypes import guess_type, add_type
 from os.path import splitext
@@ -113,6 +113,27 @@ def override_template(template, content_type=None):
         request.pecan['override_content_type'] = content_type
 
 
+# Unfortunately, webob.exc.status_map is non-deterministic, so we have to
+# generate this ourselves
+status_map = {}
+
+
+def _gen_status_map(m):
+    for _key in dir(exc):
+        _cls = getattr(exc, _key)
+        _bases = (exc.HTTPRedirection, exc.HTTPClientError,
+                  exc.HTTPServerError)
+        if (
+            isclass(_cls) and
+            _cls not in _bases and
+            issubclass(_cls, (exc.HTTPOk,) + _bases) and
+            getattr(_cls, 'code', None) and
+            not _cls.__name__.startswith('_')
+        ):
+            m[_cls.code] = _cls
+_gen_status_map(status_map)
+
+
 def abort(status_code, detail='', headers=None, comment=None, **kw):
     '''
     Raise an HTTP status code, as specified. Useful for returning status
@@ -127,7 +148,7 @@ def abort(status_code, detail='', headers=None, comment=None, **kw):
     # If there is a traceback, we need to catch it for a re-raise
     try:
         _, _, traceback = sys.exc_info()
-        webob_exception = exc.status_map[status_code](
+        webob_exception = status_map[status_code](
             detail=detail,
             headers=headers,
             comment=comment,
@@ -183,7 +204,7 @@ def redirect(location=None, internal=False, code=None, headers={},
         raise ForwardRequestException(location)
     if code is None:
         code = 302
-    raise exc.status_map[code](location=location, headers=headers)
+    raise status_map[code](location=location, headers=headers)
 
 
 def render(template, namespace, app=None):
