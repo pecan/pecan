@@ -1,3 +1,11 @@
+1.0.1
+====
+* Fixed a bug wherein the file extension for URLs with a trailing slash
+  (`file.html` vs `file.html/`) were not correctly guessed, thus resulting in
+  incorrect Content-Type headers.
+* Fixed a subtle bug in `pecan.config.Configuration` attribute/item assignment
+  that caused some types of configuration changes to silently fail.
+
 1.0.0
 =====
 * Replaced pecan's debugger middleware with an (optional) dependency on the
