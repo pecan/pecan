@@ -5,6 +5,7 @@ from __future__ import print_function
 import logging
 import os
 import sys
+import threading
 import time
 import subprocess
 from wsgiref.simple_server import WSGIRequestHandler
@@ -56,6 +57,9 @@ class ServeCommand(BaseCommand):
         parent = self
 
         class AggressiveEventHandler(FileSystemEventHandler):
+
+            lock = threading.Lock()
+
             def should_reload(self, event):
                 for t in (
                     FileSystemMovedEvent, FileModifiedEvent, DirModifiedEvent
@@ -65,9 +69,11 @@ class ServeCommand(BaseCommand):
                 return False
 
             def on_modified(self, event):
-                if self.should_reload(event):
+                if self.should_reload(event) and self.lock.acquire(False):
                     parent.server_process.kill()
                     parent.create_subprocess()
+                    time.sleep(1)
+                    self.lock.release()
 
         # Determine a list of file paths to monitor
         paths = self.paths_to_monitor(conf)
