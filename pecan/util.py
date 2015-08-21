@@ -26,15 +26,26 @@ def getargspec(method):
     # NOTE(sileht): if the closure is None we cannot look deeper,
     # so return actual argspec, this occurs when the method
     # is static for example.
-    if func_closure is None:
+    if not func_closure:
         return argspec
 
-    closure = next(
-        (
-            c for c in func_closure if six.callable(c.cell_contents)
-        ),
-        None
+    closure = None
+    # In the case of deeply nested decorators (with arguments), it's possible
+    # that there are several callables in scope;  Take a best guess and go
+    # with the one that looks most like a pecan controller function
+    # ('self' is the first argument)
+    func_closure = filter(
+        lambda c: six.callable(c.cell_contents),
+        func_closure
     )
+    func_closure = sorted(
+        func_closure,
+        key=lambda c: 'self' in c.cell_contents.__code__.co_varnames,
+        reverse=True
+    )
+
+    closure = func_closure[0]
+
     method = closure.cell_contents
     return getargspec(method)
 
