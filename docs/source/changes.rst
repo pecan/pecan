@@ -1,3 +1,10 @@
+1.0.2
+=====
+* Fixed an edge case in `pecan.util.getargspec` that caused the incorrect
+  argspec to be returned in certain situations when using Python 2.6.
+* Added a `threading.lock` to the file system monitoring in `pecan serve
+  --reload` to avoid extraneous server reloads.
+
 1.0.1
 ====
 * Fixed a bug wherein the file extension for URLs with a trailing slash
