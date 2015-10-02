@@ -48,7 +48,7 @@ def walk_controller(root_class, controller, hooks, seen=None):
                 if (
                     isinstance(value, types.MethodType) and
                     any(filter(lambda c: value.__func__ in c.__dict__.values(),
-                               value.im_class.mro()[1:]))
+                               value.__self__.__class__.mro()[1:]))
                 ):
                     continue
                 walk_controller(root_class, value, hooks, seen)
