@@ -1,3 +1,8 @@
+1.0.3
+=====
+* Fixed a bug in `pecan.hooks.HookController` for newer versions of Python3.4
+  (https://github.com/pecan/pecan/issues/19).
+
 1.0.2
 =====
 * Fixed an edge case in `pecan.util.getargspec` that caused the incorrect
