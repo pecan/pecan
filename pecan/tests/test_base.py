@@ -1971,6 +1971,25 @@ class TestEngines(PecanTestCase):
         assert r.status_int == 200
         assert r.body == b_("Bill")
 
+    def test_explicit_renderer(self):
+
+        class LookupController(object):
+            def __init__(self, name):
+                self.name = name
+
+            @expose('json', content_type='application/json')
+            def index(self):
+                return {'name': self.name}
+
+        class RootController(object):
+            @expose()
+            def _lookup(self, name, *remainder):
+                return LookupController(name), remainder
+
+        app = TestApp(Pecan(RootController()))
+        r = app.get('/package.rpm/')
+        assert r.status_int == 200
+
 
 class TestDeprecatedRouteMethod(PecanTestCase):
 
