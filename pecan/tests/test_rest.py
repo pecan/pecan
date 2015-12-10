@@ -1558,6 +1558,7 @@ class TestRestController(PecanTestCase):
         assert r.status_int == 405
         assert r.headers['Allow'] == 'GET'
 
+    @unittest.skipIf(sys.maxunicode <= 65536, 'narrow python build with UCS-2')
     def test_rest_with_utf8_uri(self):
 
         class FooController(RestController):
