@@ -40,6 +40,7 @@ class TestStaticFileMiddleware(PecanTestCase):
     def test_file_can_be_found(self):
         result = self._request('/static_fixtures/text.txt')
         assert isinstance(result, FileWrapper)
+        result.close()
 
     def test_no_file_found_causes_passthrough(self):
         result = self._request('/static_fixtures/nosuchfile.txt')
@@ -47,8 +48,9 @@ class TestStaticFileMiddleware(PecanTestCase):
         assert result == ['Hello world!\n']
 
     def test_mime_type_works_for_png_files(self):
-        self._request('/static_fixtures/self.png')
+        result = self._request('/static_fixtures/self.png')
         assert self._get_response_header('Content-Type') == 'image/png'
+        result.close()
 
     def test_file_can_be_closed(self):
         result = self._request('/static_fixtures/text.txt')
@@ -57,6 +59,7 @@ class TestStaticFileMiddleware(PecanTestCase):
     def test_file_can_be_iterated_over(self):
         result = self._request('/static_fixtures/text.txt')
         assert len([x for x in result])
+        result.close()
 
     def test_date_dumping_on_unix_timestamps(self):
         result = _dump_date(1331755274.59, ' ')
@@ -66,3 +69,4 @@ class TestStaticFileMiddleware(PecanTestCase):
         os.altsep = ':'
         result = self._request(':static_fixtures:text.txt')
         assert isinstance(result, FileWrapper)
+        result.close()

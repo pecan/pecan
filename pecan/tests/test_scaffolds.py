@@ -61,12 +61,10 @@ class TestScaffoldUtils(PecanTestCase):
         assert os.path.isfile(os.path.join(
             self.scaffold_destination, 'someapp', 'bar', 'spam.txt'
         ))
-        assert open(os.path.join(
+        with open(os.path.join(
             self.scaffold_destination, 'someapp', 'foo'
-        ), 'r').read().strip() == 'YAR'
-        assert open(os.path.join(
-            self.scaffold_destination, 'someapp', 'foo'
-        ), 'r').read().strip() == 'YAR'
+        ), 'r') as f:
+            assert f.read().strip() == 'YAR'
 
     def test_destination_directory_levels_deep(self):
         from pecan.scaffolds import copy_dir
@@ -86,12 +84,14 @@ class TestScaffoldUtils(PecanTestCase):
         assert os.path.isfile(os.path.join(
             self.scaffold_destination, 'some', 'app', 'bar', 'spam.txt')
         )
-        assert open(os.path.join(
+        with open(os.path.join(
             self.scaffold_destination, 'some', 'app', 'foo'
-        ), 'r').read().strip() == 'YAR'
-        assert open(os.path.join(
+        ), 'r') as f:
+            assert f.read().strip() == 'YAR'
+        with open(os.path.join(
             self.scaffold_destination, 'some', 'app', 'bar', 'spam.txt'
-        ), 'r').read().strip() == 'Pecan'
+        ), 'r') as f:
+            assert f.read().strip() == 'Pecan'
 
     def test_destination_directory_already_exists(self):
         from pecan.scaffolds import copy_dir
@@ -125,12 +125,14 @@ class TestScaffoldUtils(PecanTestCase):
         assert os.path.isfile(os.path.join(
             self.scaffold_destination, 'someapp', 'bar_thingy', 'spam.txt')
         )
-        assert open(os.path.join(
+        with open(os.path.join(
             self.scaffold_destination, 'someapp', 'foo_thingy'
-        ), 'r').read().strip() == 'YAR'
-        assert open(os.path.join(
+        ), 'r') as f:
+            assert f.read().strip() == 'YAR'
+        with open(os.path.join(
             self.scaffold_destination, 'someapp', 'bar_thingy', 'spam.txt'
-        ), 'r').read().strip() == 'Pecan'
+        ), 'r') as f:
+            assert f.read().strip() == 'Pecan'
 
     def test_copy_dir_with_file_content_substitution(self):
         from pecan.scaffolds import copy_dir
@@ -152,9 +154,11 @@ class TestScaffoldUtils(PecanTestCase):
         assert os.path.isfile(os.path.join(
             self.scaffold_destination, 'someapp', 'bar', 'spam.txt')
         )
-        assert open(os.path.join(
+        with open(os.path.join(
             self.scaffold_destination, 'someapp', 'foo'
-        ), 'r').read().strip() == 'YAR thingy'
-        assert open(os.path.join(
+        ), 'r') as f:
+            assert f.read().strip() == 'YAR thingy'
+        with open(os.path.join(
             self.scaffold_destination, 'someapp', 'bar', 'spam.txt'
-        ), 'r').read().strip() == 'Pecan thingy'
+        ), 'r') as f:
+            assert f.read().strip() == 'Pecan thingy'
