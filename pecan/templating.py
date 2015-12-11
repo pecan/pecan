@@ -189,7 +189,8 @@ def format_line_context(filename, lineno, context=10):
     :param context: number of lines of code to display before and after the
                     offending line.
     '''
-    lines = open(filename).readlines()
+    with open(filename) as f:
+        lines = f.readlines()
 
     lineno = lineno - 1  # files are indexed by 1 not 0
     if lineno > 0:
