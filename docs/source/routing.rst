@@ -70,6 +70,7 @@ route to the following controller methods:
              └── BooksController.index
                 └── BooksController.bestsellers
 
+
 Exposing Controllers
 --------------------
 
@@ -221,8 +222,6 @@ HTTP ``POST``) using `generic controllers`:
             return dict(uuid=uuid)
 
 
-
-
 Pecan's Routing Algorithm
 -------------------------
 
@@ -276,6 +275,7 @@ method matches the URL and there is no :func:`_default` method.
 
 An HTTP GET request to ``/8/name`` would return the name of the student
 where ``primary_key == 8``.
+
 
 Falling Back with ``_default``
 ------------------------------
@@ -394,7 +394,6 @@ If you'd like to return an explicit response, you can do so using
             return Response('Hello, World!', 202)
 
 
-
 Extending Pecan's Request and Response Object
 ---------------------------------------------
 
@@ -422,6 +421,7 @@ and modify your application configuration to use them::
         'request_cls': MyRequest,
         'response_cls': MyResponse
     }
+
 
 Mapping Controller Arguments
 ----------------------------
@@ -485,6 +485,7 @@ The same effect can be achieved with HTTP ``POST`` body variables:
     $ curl -X POST "http://localhost:8080/" -H "Content-Type: application/x-www-form-urlencoded" -d "arg=foo"
     foo
 
+
 Static File Serving
 -------------------
 
@@ -539,6 +540,7 @@ decorator::
                 'Content-Disposition'
             ] = 'attachment; filename="%s"' % os.path.basename(f.name)
 
+
 Handling File Uploads
 ---------------------
 
@@ -564,6 +566,7 @@ application's controller:
         def upload(self):
             assert isinstance(request.POST['file'], cgi.FieldStorage)
             data = request.POST['file'].file.read()
+
 
 Thread-Safe Per-Request Storage
 -------------------------------
