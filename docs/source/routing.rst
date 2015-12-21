@@ -598,3 +598,42 @@ internal or ``HTTP 302`` redirects.
 
   The :func:`redirect` utility, along with several other useful
   helpers, are documented in :ref:`pecan_core`.
+
+
+Determining the URL for a Controller
+------------------------------------
+Given the ability for routing to be drastically changed at runtime, it is not
+always possible to correctly determine a mapping between a controller method
+and a URL.
+
+For example, in the following code that makes use of :func:`_lookup` to alter
+the routing depending on a condition::
+
+
+    from pecan import expose, abort
+    from somelib import get_user_region
+
+
+    class DefaultRegionController(object):
+
+        @expose()
+        def name(self):
+            return "Default Region"
+
+    class USRegionController(object):
+
+        @expose()
+        def name(self):
+            return "US Region"
+
+    class RootController(object):
+        @expose()
+        def _lookup(self, user_id, *remainder):
+            if get_user_region(user_id) == 'us':
+                return USRegionController(), remainder
+            else:
+                return DefaultRegionController(), remainder
+
+This logic depends on the geolocation of a given user and returning
+a completely different class given the condition. A helper to determine what
+URL ``USRegionController.name`` belongs to would fail to do it correctly.
