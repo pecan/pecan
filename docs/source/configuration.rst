@@ -4,7 +4,7 @@ Configuring Pecan Applications
 ==============================
 
 Pecan is very easy to configure. As long as you follow certain conventions,
-using, setting and dealing with configuration should be very intuitive.  
+using, setting and dealing with configuration should be very intuitive.
 
 Pecan configuration files are pure Python. Each "section" of the
 configuration is a dictionary assigned to a variable name in the
@@ -24,7 +24,7 @@ Below is the complete list of default values the framework uses::
     app = {
         'root' : None,
         'modules' : [],
-        'static_root' : 'public', 
+        'static_root' : 'public',
         'template_path' : ''
     }
 
@@ -46,14 +46,14 @@ A typical application configuration might look like this::
     app = {
         'root' : 'project.controllers.root.RootController',
         'modules' : ['project'],
-        'static_root'   : '%(confdir)s/public', 
+        'static_root'   : '%(confdir)s/public',
         'template_path' : '%(confdir)s/project/templates',
-        'debug' : True 
+        'debug' : True
     }
 
 Let's look at each value and what it means:
 
-**modules** 
+**modules**
   A list of modules where pecan will search for applications.
   Generally this should contain a single item, the name of your
   project's python package.  At least one of the listed modules must
@@ -165,7 +165,7 @@ a result (shortened for brevity):
     Config({'app': Config({'errors': {}, 'template_path': '', 'static_root': 'public', [...]
     >>> conf.to_dict()
     {'app': {'errors': {}, 'template_path': '', 'static_root': 'public', [...]
-    
+
 
 Prefixing Dictionary Keys
 -------------------------
