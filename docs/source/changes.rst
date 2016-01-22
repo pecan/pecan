@@ -1,3 +1,10 @@
+1.0.4
+=====
+* Removed an open file handle leak when pecan renders errors for Jinja2 and
+  Genshi templates (https://github.com/pecan/pecan/issues/30).
+* Resolved a bug which caused log output to be duplicated in projects created
+  with `pecan create` (https://github.com/pecan/pecan/issues/39).
+
 1.0.3
 =====
 * Fixed a bug in `pecan.hooks.HookController` for newer versions of Python3.4
