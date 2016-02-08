@@ -168,6 +168,28 @@ class TestHooks(PecanTestCase):
         assert run_hook[0] == 'error'
         assert response.text == 'on_error'
 
+    def test_on_error_internal_to_hook(self):
+
+        class RootController(object):
+            pass
+
+        class ErrorHook(PecanHook):
+            def after(self, state):
+                assert 1 == 2
+
+            def on_error(self, state, e):
+                r = Response()
+                r.text = u_(e.__class__.__name__)
+
+                return r
+
+        app = TestApp(make_app(RootController(), hooks=[
+            ErrorHook()
+        ]))
+
+        response = app.get('/')
+        assert response.text == 'AssertionError'
+
     def test_prioritized_hooks(self):
         run_hook = []
 
