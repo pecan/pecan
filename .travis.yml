@@ -37,6 +37,7 @@ env:
   - TOXENV=wsme-tip
 
 install:
+  - travis_retry pip install -U pip wheel
   - travis_retry pip install tox
 
 script:
