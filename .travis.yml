@@ -45,8 +45,10 @@ script:
 matrix:
   allow_failures:
     - env: TOXENV=barbican-stable
+    - env: TOXENV=barbican-tip
     - env: TOXENV=ceilometer-stable
     - env: TOXENV=designate-stable
+    - env: TOXENV=designate-tip
     - env: TOXENV=gnocchi-stable
     - env: TOXENV=ironic-stable
     - env: TOXENV=magnum-stable
