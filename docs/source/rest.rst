@@ -64,7 +64,7 @@ in pecan):
         # HTTP POST /
         @index.when(method='POST', template='json')
         def index_POST(self, **kw):
-            id_ = len(BOOKS)
+            id_ = str(len(BOOKS))
             BOOKS[id_] = kw['name']
             return dict(id=id_, name=kw['name'])
 
