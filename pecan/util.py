@@ -33,9 +33,10 @@ def getargspec(method):
     # In the case of deeply nested decorators (with arguments), it's possible
     # that there are several callables in scope;  Take a best guess and go
     # with the one that looks most like a pecan controller function
-    # ('self' is the first argument)
+    # (has a __code__ object, and 'self' is the first argument)
     func_closure = filter(
-        lambda c: six.callable(c.cell_contents),
+        lambda c: six.callable(c.cell_contents) and \
+                  hasattr(c.cell_contents, '__code__'),
         func_closure
     )
     func_closure = sorted(
