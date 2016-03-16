@@ -1,3 +1,8 @@
+1.0.5
+=====
+* Fix a bug in controller argspec detection when class-based decorators are
+  used (https://github.com/pecan/pecan/issues/47).
+
 1.0.4
 =====
 * Removed an open file handle leak when pecan renders errors for Jinja2 and
