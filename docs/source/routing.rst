@@ -77,26 +77,50 @@ Exposing Controllers
 You tell Pecan which methods in a class are publically-visible via
 :func:`~pecan.decorators.expose`. If a method is *not* decorated with
 :func:`~pecan.decorators.expose`, Pecan will never route a request to it.
-:func:`~pecan.decorators.expose` accepts three optional parameters, some of
-which can impact routing and the content type of the response body.
+
+:func:`~pecan.decorators.expose` can be used in a variety of ways.  The
+simplest case involves passing no arguments.  In this scenario, the controller
+returns a string representing the HTML response body.
 
 ::
 
     from pecan import expose
 
     class RootController(object):
-        @expose(
-            template        = None,
-            content_type    = 'text/html',
-            generic         = False
-        )
+        @expose()
         def hello(self):
             return 'Hello World'
 
 
-Let's look at an example using ``template`` and ``content_type``:
+A more common use case is to :ref:`specify a template and a namespace
+<templates>`::
+
+    from pecan import expose
+
+    class RootController(object):
+        @expose('html_template.mako')
+        def hello(self):
+            return {'msg': 'Hello!'}
 
 ::
+
+    <!-- html_template.mako -->
+    <html>
+        <body>${msg}</body>
+    </html>
+
+Pecan also has built-in support for a special :ref:`JSON renderer
+<expose_json>`, which translates template namespaces into rendered JSON text::
+
+    from pecan import expose
+
+    class RootController(object):
+        @expose('json')
+        def hello(self):
+            return {'msg': 'Hello!'}
+
+:func:`~pecan.decorators.expose` calls can also be stacked, which allows you to
+serialize content differently depending on how the content is requested::
 
     from pecan import expose
 
@@ -115,14 +139,15 @@ different arguments.
         @expose('json')
 
 The first tells Pecan to serialize the response namespace using JSON
-serialization when the client requests ``/hello.json``.
+serialization when the client requests ``/hello.json`` or if an
+``Accept: application/json`` header is present.
 
 ::
 
         @expose('text_template.mako', content_type='text/plain')
 
 The second tells Pecan to use the ``text_template.mako`` template file when the
-client requests ``/hello.txt``.
+client requests ``/hello.txt`` or asks for text/plain via an ``Accept`` header.
 
 ::
 
@@ -130,7 +155,8 @@ client requests ``/hello.txt``.
 
 The third tells Pecan to use the ``html_template.mako`` template file when the
 client requests ``/hello.html``. If the client requests ``/hello``, Pecan will
-use the ``text/html`` content type by default.
+use the ``text/html`` content type by default; in the absense of an explicit
+content type, Pecan assumes the client wants HTML.
 
 .. seealso::
 
