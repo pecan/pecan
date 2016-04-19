@@ -30,6 +30,7 @@ env:
   - TOXENV=gnocchi-tip
   - TOXENV=ironic-stable
   - TOXENV=ironic-tip
+  - TOXENV=neutron-stable
   - TOXENV=neutron-tip
   - TOXENV=magnum-stable
   - TOXENV=magnum-tip
@@ -50,6 +51,7 @@ matrix:
     - env: TOXENV=designate-stable
     - env: TOXENV=designate-tip
     - env: TOXENV=gnocchi-stable
+    - env: TOXENV=neutron-stable
     - env: TOXENV=ironic-stable
     - env: TOXENV=magnum-stable
     - env: TOXENV=wsme-stable
