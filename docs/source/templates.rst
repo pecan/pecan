@@ -95,6 +95,7 @@ template, and :func:`~pecan.core.render` returns the rendered output as text.
     def controller(self):
         return render('my_template.html', dict(message='I am the namespace'))
 
+.. _expose_json:
 
 The JSON Renderer
 -----------------
@@ -141,3 +142,11 @@ your application's configuration::
         },
         # ...
     }
+
+...and specify the renderer in the :func:`~pecan.decorators.expose` method::
+
+    class RootController(object):
+
+        @expose('my_renderer:template.html')
+        def index(self):
+            return dict(name='Bob')

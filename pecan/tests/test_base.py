@@ -20,7 +20,7 @@ from pecan import (
     abort, make_app, override_template, render, route
 )
 from pecan.templating import (
-    _builtin_renderers as builtin_renderers, error_formatters
+    _builtin_renderers as builtin_renderers, error_formatters, MakoRenderer
 )
 from pecan.decorators import accept_noncanonical
 from pecan.tests import PecanTestCase
@@ -1919,6 +1919,36 @@ class TestEngines(PecanTestCase):
         assert r.status_int == 200
         result = dict(loads(r.body.decode()))
         assert result == expected_result
+
+    def test_custom_renderer(self):
+
+        class RootController(object):
+            @expose('backwards:mako.html')
+            def index(self, name='Joe'):
+                return dict(name=name)
+
+        class BackwardsRenderer(MakoRenderer):
+            # Custom renderer that reverses all string namespace values
+            def render(self, template_path, namespace):
+                namespace = dict(
+                    (k, v[::-1])
+                    for k, v in namespace.items()
+                )
+                return super(BackwardsRenderer, self).render(template_path,
+                                                             namespace)
+
+        app = TestApp(Pecan(
+            RootController(),
+            template_path=self.template_path,
+            custom_renderers={'backwards': BackwardsRenderer}
+        ))
+        r = app.get('/')
+        assert r.status_int == 200
+        assert b_("<h1>Hello, eoJ!</h1>") in r.body
+
+        r = app.get('/index.html?name=Tim')
+        assert r.status_int == 200
+        assert b_("<h1>Hello, miT!</h1>") in r.body
 
     def test_override_template(self):
         class RootController(object):

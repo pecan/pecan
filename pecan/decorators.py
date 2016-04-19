@@ -32,7 +32,9 @@ def expose(template=None,
     access via HTTP, and to configure that access.
 
     :param template: The path to a template, relative to the base template
-                     directory.
+                     directory.  Can also be passed a string representing
+                     a special or custom renderer, such as ``'json'`` for
+                     :ref:`expose_json`.
     :param content_type: The content-type to use for this template.
     :param generic: A boolean which flags this as a "generic" controller,
                     which uses generic functions based upon
