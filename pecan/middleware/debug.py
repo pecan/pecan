@@ -24,6 +24,7 @@ try:
 
 
 except ImportError:
+    import logging
     from traceback import print_exc
     from pprint import pformat
 
@@ -31,6 +32,8 @@ except ImportError:
     from six.moves import cStringIO as StringIO
     from webob import Response
     from webob.exc import HTTPException
+
+    LOG = logging.getLogger(__file__)
 
     debug_template_raw = '''<html>
      <head>
@@ -76,6 +79,7 @@ except ImportError:
                 # get a formatted exception
                 out = StringIO()
                 print_exc(file=out)
+                LOG.exception(exc)
 
                 # get formatted WSGI environment
                 formatted_environ = pformat(environ)
