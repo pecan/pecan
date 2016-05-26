@@ -1,3 +1,10 @@
+1.1.0
+=====
+* `pecan.middleware.debug.DebugMiddleware` now logs exceptions at the ERROR
+  level (https://github.com/pecan/pecan/pull/56).
+* Fix a Javascript bug in the default project scaffold
+  (https://github.com/pecan/pecan/pull/55).
+
 1.0.5
 =====
 * Fix a bug in controller argspec detection when class-based decorators are
