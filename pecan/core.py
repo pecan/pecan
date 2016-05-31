@@ -668,6 +668,9 @@ class PecanBase(object):
         }
         controller = None
 
+        # track internal redirects
+        internal_redirect = False
+
         # handle the request
         try:
             # add context and environment to the request
@@ -697,9 +700,12 @@ class PecanBase(object):
                     state.response.content_type = best_match
                 environ['pecan.original_exception'] = e
 
+            # note if this is an internal redirect
+            internal_redirect = isinstance(e, ForwardRequestException)
+
             # if this is not an internal redirect, run error hooks
             on_error_result = None
-            if not isinstance(e, ForwardRequestException):
+            if not internal_redirect:
                 on_error_result = self.handle_hooks(
                     self.determine_hooks(state.controller),
                     'on_error',
@@ -720,10 +726,13 @@ class PecanBase(object):
                 if allowed_methods:
                     state.response.allow = sorted(allowed_methods)
         finally:
-            # handle "after" hooks
-            self.handle_hooks(
-                self.determine_hooks(state.controller), 'after', state
-            )
+            # if this is not an internal redirect, run "after" hooks
+            if not internal_redirect:
+                self.handle_hooks(
+                    self.determine_hooks(state.controller),
+                    'after',
+                    state
+                )
 
         self._handle_empty_response_body(state)
 
