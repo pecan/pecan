@@ -668,15 +668,7 @@ class PecanBase(object):
         }
         controller = None
 
-        # handle the request
-        try:
-            # add context and environment to the request
-            req.context = environ.get('pecan.recursive.context', {})
-            req.pecan = dict(content_type=None)
-
-            controller, args, kwargs = self.find_controller(state)
-            self.invoke_controller(controller, args, kwargs, state)
-        except Exception as e:
+        def _handle_exc(e):
             # if this is an HTTP Exception, set it as the response
             if isinstance(e, exc.HTTPException):
                 # if the client asked for JSON, do our best to provide it
@@ -719,11 +711,25 @@ class PecanBase(object):
                 allowed_methods = _cfg(controller).get('allowed_methods', [])
                 if allowed_methods:
                     state.response.allow = sorted(allowed_methods)
+
+        # handle the request
+        try:
+            # add context and environment to the request
+            req.context = environ.get('pecan.recursive.context', {})
+            req.pecan = dict(content_type=None)
+
+            controller, args, kwargs = self.find_controller(state)
+            self.invoke_controller(controller, args, kwargs, state)
+        except Exception as e:
+            _handle_exc(e)
         finally:
-            # handle "after" hooks
-            self.handle_hooks(
-                self.determine_hooks(state.controller), 'after', state
-            )
+            try:
+                # handle "after" hooks
+                self.handle_hooks(
+                    self.determine_hooks(state.controller), 'after', state
+                )
+            except Exception as e:
+                _handle_exc(e)
 
         self._handle_empty_response_body(state)
 
