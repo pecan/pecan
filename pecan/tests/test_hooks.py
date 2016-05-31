@@ -416,6 +416,28 @@ class TestHooks(PecanTestCase):
         # for each different instance of the Hook in the two Controllers
         assert run_hook[3] == 'last - before hook', run_hook[3]
 
+    def test_internal_redirect_with_after_hook(self):
+        run_hook = []
+
+        class RootController(object):
+            @expose()
+            def internal(self):
+                redirect('/testing', internal=True)
+
+            @expose()
+            def testing(self):
+                return 'it worked!'
+
+        class SimpleHook(PecanHook):
+            def after(self, state):
+                run_hook.append('after')
+
+        app = TestApp(make_app(RootController(), hooks=[SimpleHook()]))
+        response = app.get('/internal')
+        assert response.body == b_('it worked!')
+
+        assert len(run_hook) == 1
+
 
 class TestStateAccess(PecanTestCase):
 
