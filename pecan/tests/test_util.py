@@ -1,9 +1,9 @@
 import functools
-import inspect
 import unittest
 
 from pecan import expose
 from pecan import util
+from pecan.compat import getargspec
 
 
 class TestArgSpec(unittest.TestCase):
@@ -25,11 +25,11 @@ class TestArgSpec(unittest.TestCase):
         return RootController()
 
     def test_no_decorator(self):
-        expected = inspect.getargspec(self.controller.index.__func__)
+        expected = getargspec(self.controller.index.__func__)
         actual = util.getargspec(self.controller.index.__func__)
         assert expected == actual
 
-        expected = inspect.getargspec(self.controller.static_index)
+        expected = getargspec(self.controller.static_index)
         actual = util.getargspec(self.controller.static_index)
         assert expected == actual
 
@@ -37,11 +37,11 @@ class TestArgSpec(unittest.TestCase):
         def dec(f):
             return f
 
-        expected = inspect.getargspec(self.controller.index.__func__)
+        expected = getargspec(self.controller.index.__func__)
         actual = util.getargspec(dec(self.controller.index.__func__))
         assert expected == actual
 
-        expected = inspect.getargspec(self.controller.static_index)
+        expected = getargspec(self.controller.static_index)
         actual = util.getargspec(dec(self.controller.static_index))
         assert expected == actual
 
@@ -52,11 +52,11 @@ class TestArgSpec(unittest.TestCase):
                 return f(*a, **kw)
             return wrapped
 
-        expected = inspect.getargspec(self.controller.index.__func__)
+        expected = getargspec(self.controller.index.__func__)
         actual = util.getargspec(dec(self.controller.index.__func__))
         assert expected == actual
 
-        expected = inspect.getargspec(self.controller.static_index)
+        expected = getargspec(self.controller.static_index)
         actual = util.getargspec(dec(self.controller.static_index))
         assert expected == actual
 
@@ -67,11 +67,11 @@ class TestArgSpec(unittest.TestCase):
                 return f(*a, **kw)
             return wrapped
 
-        expected = inspect.getargspec(self.controller.index.__func__)
+        expected = getargspec(self.controller.index.__func__)
         actual = util.getargspec(dec(dec(dec(self.controller.index.__func__))))
         assert expected == actual
 
-        expected = inspect.getargspec(self.controller.static_index)
+        expected = getargspec(self.controller.static_index)
         actual = util.getargspec(dec(dec(dec(
             self.controller.static_index))))
         assert expected == actual
@@ -85,11 +85,11 @@ class TestArgSpec(unittest.TestCase):
                 return wrapped
             return inner
 
-        expected = inspect.getargspec(self.controller.index.__func__)
+        expected = getargspec(self.controller.index.__func__)
         actual = util.getargspec(dec(True)(self.controller.index.__func__))
         assert expected == actual
 
-        expected = inspect.getargspec(self.controller.static_index)
+        expected = getargspec(self.controller.static_index)
         actual = util.getargspec(dec(True)(
             self.controller.static_index))
         assert expected == actual

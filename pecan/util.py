@@ -1,7 +1,8 @@
-import inspect
 import sys
 
 import six
+
+from pecan.compat import getargspec as _getargspec
 
 
 def iscontroller(obj):
@@ -14,7 +15,7 @@ def getargspec(method):
     for a method.
     """
 
-    argspec = inspect.getargspec(method)
+    argspec = _getargspec(method)
     args = argspec[0]
     if args and args[0] == 'self':
         return argspec
