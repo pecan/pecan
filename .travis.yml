@@ -55,3 +55,18 @@ matrix:
     - env: TOXENV=ironic-stable
     - env: TOXENV=magnum-stable
     - env: TOXENV=wsme-stable
+  include:
+    - python: 3.5
+      env:
+      - TOXENV=py35
+    - python: 3.5
+      env:
+      - TOXENV=scaffolds-35
+    - python: 3.5
+      env:
+      - TOXENV=scaffolds-35-rest-api
+
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#pecanpy"
