@@ -1,3 +1,13 @@
+1.1.1
+=====
+* Pecan now officially supports Python 3.5.
+* Pecan now uses `inspect.signature` instead of `inspect.getargspec` in
+  Python 3.5 and higher (because `inspect.getargspec` is deprecated in these
+  versions of Python 3).
+* Fixed a bug that caused "after" hooks to run multiple times when
+  `pecan.redirect(..., internal=True)` was used
+  (https://github.com/pecan/pecan/issues/58).
+
 1.1.0
 =====
 * `pecan.middleware.debug.DebugMiddleware` now logs exceptions at the ERROR
