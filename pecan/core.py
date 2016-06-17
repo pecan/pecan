@@ -1,7 +1,3 @@
-try:
-    from simplejson import dumps, loads
-except ImportError:  # pragma: no cover
-    from json import dumps, loads  # noqa
 from inspect import Arguments
 from itertools import chain, tee
 from mimetypes import guess_type, add_type
@@ -18,6 +14,7 @@ from webob import (Request as WebObRequest, Response as WebObResponse, exc,
 from webob.multidict import NestedMultiDict
 
 from .compat import urlparse, izip
+from .jsonify import encode as dumps
 from .secure import handle_security
 from .templating import RendererFactory
 from .routing import lookup_controller, NonCanonicalPath
