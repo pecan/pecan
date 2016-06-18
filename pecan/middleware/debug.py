@@ -2,7 +2,7 @@ __CONFIG_HELP__ = '''
 <div class="traceback">
   <b>To disable this interface, set </b>
   <a target="window"
-  href="https://pecan.readthedocs.org/en/latest/deployment.html#disabling-debug-mode">
+  href="https://pecan.readthedocs.io/en/latest/deployment.html#disabling-debug-mode">
     <pre>conf.app.debug = False</pre>
   </a>
 </div>

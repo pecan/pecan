@@ -208,7 +208,7 @@
   <http://docs.openstack.org/infra/system-config/stackforge.html>`_, including Gerrit code review,
   Jenkins continuous integration, and GitHub mirroring.
 * Added a pecan plugin for the popular `uwsgi server
-  <http://uwsgi-docs.readthedocs.org>`_.
+  <https://uwsgi-docs.readthedocs.io>`_.
 * Replaced the ``simplegeneric`` dependency with the new
   ``functools.singledispatch`` function in preparation for  Python 3.4 support.
 * Optimized pecan's core dispatch routing for notably faster response times.
