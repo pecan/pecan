@@ -81,7 +81,7 @@ add it to :class:`test_project.root.RootController` class
 
         @index.when(method='POST')
         def index_post(self, q):
-            redirect('http://pecan.readthedocs.org/en/latest/search.html?q=%s' % q)
+            redirect('https://pecan.readthedocs.io/en/latest/search.html?q=%s' % q)
 
 
         ## custom handling of '404 Page Not Found' messages

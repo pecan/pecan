@@ -211,7 +211,7 @@ This is how it looks in the project template
 
         @index.when(method='POST')
         def index_post(self, q):
-            redirect('http://pecan.readthedocs.org/en/latest/search.html?q=%s' % q)
+            redirect('https://pecan.readthedocs.io/en/latest/search.html?q=%s' % q)
 
         @expose('error.html')
         def error(self, status):
@@ -245,7 +245,7 @@ template.
 
     @index.when(method='POST')
     def index_post(self, q):
-        redirect('http://pecan.readthedocs.org/en/latest/search.html?q=%s' % q)
+        redirect('https://pecan.readthedocs.io/en/latest/search.html?q=%s' % q)
 
 The :func:`index_post` method receives one HTTP ``POST`` argument (``q``).  Because
 the argument ``method`` to :func:`@index.when` has been set to ``'POST'``, any

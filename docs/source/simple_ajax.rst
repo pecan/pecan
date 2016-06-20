@@ -221,11 +221,11 @@ Add the following code to the ``projects.py`` file:
                 Project(name='Pecan',
                         licensing='BSD',
                         repository='http://github.com/pecan/pecan',
-                        documentation='http://pecan.readthedocs.org'),
+                        documentation='https://pecan.readthedocs.io'),
                 Project(name='stevedore',
                         licensing='Apache 2',
                         repository='http://github.com/dreamhost/pecan',
-                        documentation='http://stevedore.readthedocs.org')
+                        documentation='http://docs.openstack.org/developer/stevedore/')
             ]
 
 

@@ -33,7 +33,7 @@ Running Tests
 
 Viewing Documentation
 ---------------------
-`Available online <http://pecan.readthedocs.org>`_, or to build manually::
+`Available online <https://pecan.readthedocs.io>`_, or to build manually::
 
     $ cd docs && make html
     $ open docs/build/html/index.html

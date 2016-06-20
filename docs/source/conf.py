@@ -33,8 +33,8 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx']
 intersphinx_mapping = {
     'python': ('http://docs.python.org', None),
     'webob': ('http://docs.webob.org/en/latest', None),
-    'webtest': ('http://webtest.readthedocs.org/en/latest/', None),
-    'beaker': ('http://beaker.readthedocs.org/en/latest/', None),
+    'webtest': ('https://webtest.readthedocs.io/en/latest/', None),
+    'beaker': ('https://beaker.readthedocs.io/en/latest/', None),
     'paste': ('http://pythonpaste.org', None),
 }
 
