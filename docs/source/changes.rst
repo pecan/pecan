@@ -1,3 +1,12 @@
+1.1.2
+=====
+* Fixed a bug where JSON-formatted HTTP response bodies were not making
+  use of pecan's JSON type registration functionality
+  (http://pecan.readthedocs.io/en/latest/jsonify.html)
+  (https://github.com/pecan/pecan/issues/68).
+* Updated code and documentation examples to support readthedoc's move from
+  `readthedocs.org` to `readthedocs.io`.
+
 1.1.1
 =====
 * Pecan now officially supports Python 3.5.
