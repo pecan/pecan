@@ -25,32 +25,8 @@ def getargspec(func):
     if sys.version_info < (3, 5):
         return inspect.getargspec(func)
 
-    sig = inspect._signature_from_callable(func, follow_wrapper_chains=False,
-                                           skip_bound_arg=False,
-                                           sigcls=inspect.Signature)
-    args = [
-        p.name for p in sig.parameters.values()
-        if p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD
-    ]
-    varargs = [
-        p.name for p in sig.parameters.values()
-        if p.kind == inspect.Parameter.VAR_POSITIONAL
-    ]
-    varargs = varargs[0] if varargs else None
-    varkw = [
-        p.name for p in sig.parameters.values()
-        if p.kind == inspect.Parameter.VAR_KEYWORD
-    ]
-    varkw = varkw[0] if varkw else None
-    defaults = [
-        p.default for p in sig.parameters.values()
-        if (p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD and
-            p.default is not p.empty)
-    ] or None
-    if defaults is not None:
-        defaults = tuple(defaults)
-
     from collections import namedtuple
     ArgSpec = namedtuple('ArgSpec', 'args varargs keywords defaults')
-
-    return ArgSpec(args, varargs, varkw, defaults)
+    args, varargs, keywords, defaults = inspect.getfullargspec(func)[:4]
+    return ArgSpec(args=args, varargs=varargs, keywords=keywords,
+                   defaults=defaults)
