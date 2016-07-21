@@ -384,8 +384,8 @@ class RestController(object):
                 remainder = remainder[:-1]
             if method.upper() in self._custom_actions.get(method_name, []):
                 controller = self._find_controller(
-                    '%s_%s' % (method, method_name),
-                    method_name
+                    '%s_%s' % (method, method_name.replace('-', '_')),
+                    method_name.replace('-', '_')
                 )
                 if controller:
                     return controller, remainder

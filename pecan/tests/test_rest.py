@@ -39,7 +39,8 @@ class TestRestController(PecanTestCase):
         class ThingsController(RestController):
             data = ['zero', 'one', 'two', 'three']
 
-            _custom_actions = {'count': ['GET'], 'length': ['GET', 'POST']}
+            _custom_actions = {'count': ['GET'], 'length': ['GET', 'POST'],
+                               'show-all': ['GET']}
 
             others = OthersController()
 
@@ -105,6 +106,10 @@ class TestRestController(PecanTestCase):
             @expose()
             def other(self):
                 abort(500)
+
+            @expose('json')
+            def show_all(self):
+                return dict(items=self.data)
 
         class RootController(object):
             things = ThingsController()
@@ -257,6 +262,11 @@ class TestRestController(PecanTestCase):
         r = app.get('/things/count')
         assert r.status_int == 200
         assert r.body == b_('3')
+
+        # test custom "GET" request "show-all"
+        r = app.get('/things/show-all')
+        assert r.status_int == 200
+        assert r.body == b_(dumps(dict(items=ThingsController.data)))
 
         # test custom "GET" request "length"
         r = app.get('/things/1/length')
