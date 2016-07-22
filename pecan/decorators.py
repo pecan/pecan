@@ -11,7 +11,7 @@ __all__ = [
 
 
 def when_for(controller):
-    def when(method=None, **kw):
+    def when(method, **kw):
         def decorate(f):
             _cfg(f)['generic_handler'] = True
             controller._pecan['generic_handlers'][method.upper()] = f
