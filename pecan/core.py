@@ -417,6 +417,8 @@ class PecanBase(object):
                 self.default_renderer,
                 self.template_path
             )
+        if namespace is None:
+            return None
         return renderer.render(template, namespace)
 
     def find_controller(self, state):
