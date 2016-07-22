@@ -10,6 +10,8 @@ your Pecan project.
 
 .. _SQLAlchemy: http://sqlalchemy.org
 
+.. _init_model:
+
 ``init_model`` and Preparing Your Model
 ---------------------------------------
 
@@ -26,7 +28,7 @@ for implementing your model as you see fit.
         ├── model
         │   ├── __init__.py
         └── templates
-    
+
 By default, this module contains a special method, :func:`init_model`.
 
 ::
@@ -36,7 +38,7 @@ By default, this module contains a special method, :func:`init_model`.
     def init_model():
         """
         This is a stub method which is called at application startup time.
-        
+
         If you need to bind to a parsed database configuration, set up tables
         or ORM classes, or perform any database initialization, this is the
         recommended place to do it.
@@ -45,7 +47,7 @@ By default, this module contains a special method, :func:`init_model`.
         see https://pecan.readthedocs.io/en/latest/databases.html
         """
         pass
-        
+
 The purpose of this method is to determine bindings from your
 configuration file and create necessary engines, pools,
 etc. according to your ORM or database toolkit of choice.
@@ -63,12 +65,12 @@ configuration file with database bindings might look like.
     server = {
         ...
     }
-    
+
     # Pecan Application Configurations
     app = {
         ...
     }
-    
+
     # Bindings and options to pass to SQLAlchemy's ``create_engine``
     sqlalchemy = {
         'url'           : 'mysql://root:@localhost/dbname?charset=utf8&use_unicode=0',
@@ -86,31 +88,31 @@ bind using SQLAlchemy.
     from pecan                  import conf
     from sqlalchemy             import create_engine, MetaData
     from sqlalchemy.orm         import scoped_session, sessionmaker
-    
+
     Session = scoped_session(sessionmaker())
     metadata = MetaData()
-    
+
     def _engine_from_config(configuration):
         configuration = dict(configuration)
         url = configuration.pop('url')
         return create_engine(url, **configuration)
-    
+
     def init_model():
         conf.sqlalchemy.engine = _engine_from_config(conf.sqlalchemy)
-    
+
     def start():
         Session.bind = conf.sqlalchemy.engine
         metadata.bind = Session.bind
-    
+
     def commit():
         Session.commit()
-    
+
     def rollback():
         Session.rollback()
-    
+
     def clear():
         Session.remove()
-        
+
 Binding Within the Application
 ------------------------------
 
@@ -143,7 +145,7 @@ database binding.
             )
         ]
     )
-    
+
 In the above example, on HTTP ``POST``, ``PUT``, and ``DELETE``
 requests, :class:`~pecan.hooks.TransactionHook` takes care of the transaction
 automatically by following these rules:
@@ -162,7 +164,7 @@ automatically by following these rules:
 
 #.  If the controller returns successfully, :func:`model.commit` and
     :func:`model.clear` are called.
-    
+
 On idempotent operations (like HTTP ``GET`` and ``HEAD`` requests),
 :class:`~pecan.hooks.TransactionHook` handles transactions following different
 rules.
@@ -189,3 +191,81 @@ writing, and would always bind to a master database with read/write
 privileges).  It's also possible to extend
 :class:`~pecan.hooks.TransactionHook` or write your own hook implementation for
 more refined control over where and when database bindings are called.
+
+Assuming a master/standby setup, where the master accepts write requests and
+the standby can only get read requests, a Pecan configuration for sqlalchemy
+could be::
+
+    # Server Specific Configurations
+    server = {
+        ...
+    }
+
+    # Pecan Application Configurations
+    app = {
+        ...
+    }
+
+    # Master database
+    sqlalchemy_w = {
+        'url': 'postgresql+psycopg2://root:@master_host/dbname',
+        'pool_recycle': 3600,
+        'encoding': 'utf-8'
+    }
+
+    # Read Only database
+    sqlalchemy_ro = {
+        'url': 'postgresql+psycopg2://root:@standby_host/dbname',
+        'pool_recycle': 3600,
+        'encoding': 'utf-8'
+    }
+
+
+Given the unique configuration settings for each database, the bindings would
+need to change from what Pecan's default quickstart provides (see
+:ref:`init_model` section) to accommodate for both write and read only
+requests::
+
+
+    from pecan import conf
+    from sqlalchemy import create_engine, MetaData
+    from sqlalchemy.orm import scoped_session, sessionmaker
+
+    Session = scoped_session(sessionmaker())
+    metadata = MetaData()
+
+
+    def init_model():
+        conf.sqlalchemy_w.engine = _engine_from_config(conf.sqlalchemy_w)
+        conf.sqlalchemy_ro.engine = _engine_from_config(conf.sqlalchemy_ro)
+
+    def _engine_from_config(configuration):
+        configuration = dict(configuration)
+        url = configuration.pop('url')
+        return create_engine(url, **configuration)
+
+
+    def start():
+        Session.bind = conf.sqlalchemy_w.engine
+        metadata.bind = conf.sqlalchemy_w.engine
+
+
+    def start_read_only():
+        Session.bind = conf.sqlalchemy_ro.engine
+        metadata.bind = conf.sqlalchemy_ro.engine
+
+
+    def commit():
+        Session.commit()
+
+
+    def rollback():
+        Session.rollback()
+
+
+    def clear():
+        Session.close()
+
+
+    def flush():
+        Session.flush()
