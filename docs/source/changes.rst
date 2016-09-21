@@ -1,3 +1,12 @@
+1.2
+===
+* Added a better error message when an invalid template renderer is specified
+  in `pecan.expose()` (https://github.com/pecan/pecan/issues/81).
+* Pecan controllers that return `None` are now treated as an `HTTP 204 No
+  Content` (https://github.com/pecan/pecan/issues/72).
+* The `method` argument to `pecan.expose()` for generic controllers is no
+  longer optional (https://github.com/pecan/pecan/pull/77).
+
 1.1.2
 =====
 * Fixed a bug where JSON-formatted HTTP response bodies were not making
