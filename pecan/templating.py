@@ -285,3 +285,6 @@ class RendererFactory(object):
             else:
                 self._renderers[name] = cls(template_path, self.extra_vars)
         return self._renderers[name]
+
+    def keys(self, *args, **kwargs):
+        return self._renderer_classes.keys(*args, **kwargs)

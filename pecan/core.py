@@ -412,6 +412,11 @@ class PecanBase(object):
                 renderer_name,
                 self.template_path
             )
+            if renderer is None:
+                raise RuntimeError(
+                    'support for "%s" was not found; ' % renderer_name +
+                    'supported template engines are %s' % self.renderers.keys()
+                )
         else:
             renderer = self.renderers.get(
                 self.default_renderer,

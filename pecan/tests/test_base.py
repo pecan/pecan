@@ -1898,6 +1898,23 @@ class TestEngines(PecanTestCase):
                     break
         assert error_msg is not None
 
+    def test_renderer_not_found(self):
+
+        class RootController(object):
+            @expose('mako3:mako.html')
+            def index(self, name='Jonathan'):
+                return dict(name=name)
+
+        app = TestApp(
+            Pecan(RootController(), template_path=self.template_path)
+        )
+        try:
+            r = app.get('/')
+        except Exception as e:
+            expected = e
+
+        assert 'support for "mako3" was not found;' in str(expected)
+
     def test_json(self):
         try:
             from simplejson import loads
