@@ -2018,29 +2018,6 @@ class TestEngines(PecanTestCase):
         assert r.status_int == 200
         assert r.body == b_("Bill")
 
-    def test_template_with_no_namespace(self):
-        class RootController(object):
-            @expose('mako:mako.html')
-            def index(self):
-                return None
-
-        app = TestApp(Pecan(
-            RootController(),
-            template_path=self.template_path
-        ))
-        r = app.get('/')
-        self.assertEqual(r.status_int, 204)
-
-    def test_json_with_no_namespace(self):
-        class RootController(object):
-            @expose('json')
-            def index(self):
-                return None
-
-        app = TestApp(Pecan(RootController()))
-        r = app.get('/')
-        self.assertEqual(r.status_int, 204)
-
 
 class TestDeprecatedRouteMethod(PecanTestCase):
 
