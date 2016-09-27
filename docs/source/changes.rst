@@ -1,3 +1,9 @@
+1.2.1
+=====
+* Reverts a stable API change/regression (in the 1.2 release)
+  (https://github.com/pecan/pecan/issues/72).  This change will re-released in
+  a future major version upgrade.
+
 1.2
 ===
 * Added a better error message when an invalid template renderer is specified
