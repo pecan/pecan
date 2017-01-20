@@ -1,3 +1,4 @@
+import logging
 import re
 import warnings
 from inspect import getmembers, ismethod
@@ -11,6 +12,8 @@ from .util import iscontroller, getargspec, _cfg
 __all__ = ['lookup_controller', 'find_object', 'route']
 __observed_controllers__ = set()
 __custom_routes__ = {}
+
+logger = logging.getLogger(__name__)
 
 
 def route(*args):
@@ -177,11 +180,8 @@ def handle_lookup_traversal(obj, args):
             cross_boundary(prev_obj, obj)
             return result
     except TypeError as te:
-        msg = 'Got exception calling lookup(): %s (%s)'
-        warnings.warn(
-            msg % (te, te.args),
-            RuntimeWarning
-        )
+        logger.debug('Got exception calling lookup(): %s (%s)',
+                     te, te.args)
 
 
 def find_object(obj, remainder, notfound_handlers, request):

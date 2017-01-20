@@ -339,11 +339,9 @@ class TestLookups(PecanTestCase):
             def _lookup(self, someID):
                 return 'Bad arg spec'  # pragma: nocover
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            app = TestApp(Pecan(RootController()))
-            r = app.get('/foo/bar', expect_errors=True)
-            assert r.status_int == 404
+        app = TestApp(Pecan(RootController()))
+        r = app.get('/foo/bar', expect_errors=True)
+        assert r.status_int == 404
 
 
 class TestCanonicalLookups(PecanTestCase):
