@@ -173,15 +173,16 @@ def lookup_controller(obj, remainder, request=None):
 def handle_lookup_traversal(obj, args):
     try:
         result = obj(*args)
+    except TypeError as te:
+        logger.debug('Got exception calling lookup(): %s (%s)',
+                     te, te.args)
+    else:
         if result:
             prev_obj = obj
             obj, remainder = result
             # crossing controller boundary
             cross_boundary(prev_obj, obj)
             return result
-    except TypeError as te:
-        logger.debug('Got exception calling lookup(): %s (%s)',
-                     te, te.args)
 
 
 def find_object(obj, remainder, notfound_handlers, request):
