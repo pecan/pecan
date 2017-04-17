@@ -511,16 +511,19 @@ class PecanBase(object):
         elif cfg.get('content_type') is not None and \
                 pecan_state['content_type'] not in content_types:
 
-            msg = "Controller '%s' defined does not support content_type " + \
-                  "'%s'. Supported type(s): %s"
-            logger.error(
-                msg % (
-                    controller.__name__,
-                    pecan_state['content_type'],
-                    content_types.keys()
+            if cfg.get('explicit_content_type'):
+                pecan_state['content_type'] = cfg.get('content_type')
+            else:
+                msg = ("Controller '%s' defined does not support content_type "
+                      "'%s'. Supported type(s): %s")
+                logger.error(
+                    msg % (
+                        controller.__name__,
+                        pecan_state['content_type'],
+                        content_types.keys()
+                    )
                 )
-            )
-            raise exc.HTTPNotFound
+                raise exc.HTTPNotFound
 
         # fetch any parameters
         if req.method == 'GET':
