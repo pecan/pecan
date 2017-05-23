@@ -339,11 +339,20 @@ class TestLookups(PecanTestCase):
             def _lookup(self, someID):
                 return 'Bad arg spec'  # pragma: nocover
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            app = TestApp(Pecan(RootController()))
-            r = app.get('/foo/bar', expect_errors=True)
-            assert r.status_int == 404
+        app = TestApp(Pecan(RootController()))
+        r = app.get('/foo/bar', expect_errors=True)
+        assert r.status_int == 404
+
+    def test_lookup_with_wrong_return(self):
+        class RootController(object):
+            @expose()
+            def _lookup(self, someID, *remainder):
+                return 1
+
+        app = TestApp(Pecan(RootController()))
+        self.assertRaises(TypeError,
+                          app.get,
+                          '/foo/bar', expect_errors=True)
 
 
 class TestCanonicalLookups(PecanTestCase):
