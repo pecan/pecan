@@ -26,7 +26,13 @@ class TestRestController(PecanTestCase):
 
     def test_basic_rest(self):
 
+        class DeeperController(RestController):
+            @expose()
+            def post(self):
+                abort(400, "Posted data looks bad")
+
         class OthersController(object):
+            length = DeeperController()
 
             @expose()
             def index(self):
@@ -277,6 +283,11 @@ class TestRestController(PecanTestCase):
         r = app.post('/things/others/echo', {'value': 'test'})
         assert r.status_int == 200
         assert r.body == b_('test')
+
+        # test "POST" request through subcontroller with same name
+        # as a _custom_actions in previous controller that raise a 400
+        r = app.post('/things/others/length', {'value': 'test'})
+        assert r.status_int == 400
 
     def test_getall_with_trailing_slash(self):
 
