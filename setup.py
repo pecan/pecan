@@ -3,7 +3,7 @@ import platform
 
 from setuptools import setup, find_packages
 
-version = '1.2.1'
+version = '1.3.0'
 
 #
 # determine requirements
@@ -21,15 +21,6 @@ except:
         import simplejson  # noqa
     except:
         requirements.append("simplejson >= 2.1.1")
-
-try:
-    import argparse  # noqa
-except:
-    #
-    # This was introduced in Python 2.7 - the argparse package contains
-    # a backported replacement for 2.6
-    #
-    requirements.append('argparse')
 
 try:
     from functools import singledispatch  # noqa
@@ -52,8 +43,6 @@ tests_require = requirements + [
     'mock',
     'sqlalchemy'
 ]
-if sys.version_info < (2, 7):
-    tests_require += ['unittest2']
 
 if sys.version_info < (3, 0):
     # These don't support Python3 yet - don't run their tests
@@ -86,12 +75,12 @@ setup(
         'Operating System :: POSIX',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Internet :: WWW/HTTP :: WSGI',
         'Topic :: Software Development :: Libraries :: Application Frameworks'

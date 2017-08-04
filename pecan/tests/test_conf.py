@@ -181,11 +181,10 @@ class TestConf(PecanTestCase):
 
     def test_config_dir(self):
         from pecan import configuration
-        if sys.version_info >= (2, 6):
-            conf = configuration.Config({})
-            self.assertEqual([], dir(conf))
-            conf = configuration.Config({'a': 1})
-            self.assertEqual(['a'], dir(conf))
+        conf = configuration.Config({})
+        self.assertEqual([], dir(conf))
+        conf = configuration.Config({'a': 1})
+        self.assertEqual(['a'], dir(conf))
 
     def test_config_bad_key(self):
         from pecan import configuration

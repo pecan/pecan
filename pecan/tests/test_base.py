@@ -25,10 +25,7 @@ from pecan.templating import (
 from pecan.decorators import accept_noncanonical
 from pecan.tests import PecanTestCase
 
-if sys.version_info < (2, 7):
-    import unittest2 as unittest  # pragma: nocover
-else:
-    import unittest  # pragma: nocover
+import unittest
 
 
 class SampleRootController(object):

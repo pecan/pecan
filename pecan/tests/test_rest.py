@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import unittest
 import struct
 import sys
 import warnings
-
-if sys.version_info < (2, 7):
-    import unittest2 as unittest  # pragma: nocover
-else:
-    import unittest  # pragma: nocover
 
 try:
     from simplejson import dumps, loads
