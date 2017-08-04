@@ -1,16 +1,12 @@
 import os
+import shutil
 import sys
 import tempfile
-import shutil
+import unittest
 
 from six.moves import cStringIO as StringIO
 
 from pecan.tests import PecanTestCase
-
-if sys.version_info < (2, 7):
-    import unittest2 as unittest
-else:
-    import unittest  # noqa
 
 
 class TestPecanScaffold(PecanTestCase):

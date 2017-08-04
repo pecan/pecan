@@ -1,3 +1,8 @@
+1.3.0
+=====
+* pecan is now officially supported for Python 3.6
+* pecan is no longer supported for Python 2.6
+
 1.2.1
 =====
 * Reverts a stable API change/regression (in the 1.2 release)

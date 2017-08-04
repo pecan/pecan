@@ -4,41 +4,20 @@ services:
   - mongodb
 
 env:
-  - TOXENV=py26
   - TOXENV=py27
   - TOXENV=py33
   - TOXENV=py34
   - TOXENV=py35
-  - TOXENV=scaffolds-26
   - TOXENV=scaffolds-27
   - TOXENV=scaffolds-33
   - TOXENV=scaffolds-34
   - TOXENV=scaffolds-35
-  - TOXENV=scaffolds-26-rest-api
   - TOXENV=scaffolds-27-rest-api
   - TOXENV=scaffolds-33-rest-api
   - TOXENV=scaffolds-34-rest-api
   - TOXENV=scaffolds-35-rest-api
   - TOXENV=pypy
   - TOXENV=pep8
-
-  # OpenStack-related gating
-  - TOXENV=barbican-stable
-  - TOXENV=barbican-tip
-  - TOXENV=ceilometer-stable
-  - TOXENV=ceilometer-tip
-  - TOXENV=designate-stable
-  - TOXENV=designate-tip
-  - TOXENV=gnocchi-stable
-  - TOXENV=gnocchi-tip
-  - TOXENV=ironic-stable
-  - TOXENV=ironic-tip
-  - TOXENV=neutron-stable
-  - TOXENV=neutron-tip
-  - TOXENV=magnum-stable
-  - TOXENV=magnum-tip
-  - TOXENV=wsme-stable
-  - TOXENV=wsme-tip
 
 install:
   - travis_retry pip install tox
@@ -53,19 +32,6 @@ addons:
     packages:
       - python3.5
       - python3.5-dev
-
-matrix:
-  allow_failures:
-    - env: TOXENV=barbican-stable
-    - env: TOXENV=barbican-tip
-    - env: TOXENV=ceilometer-stable
-    - env: TOXENV=designate-stable
-    - env: TOXENV=designate-tip
-    - env: TOXENV=gnocchi-stable
-    - env: TOXENV=neutron-stable
-    - env: TOXENV=ironic-stable
-    - env: TOXENV=magnum-stable
-    - env: TOXENV=wsme-stable
 
 notifications:
   irc:

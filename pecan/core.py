@@ -18,7 +18,7 @@ from .jsonify import encode as dumps
 from .secure import handle_security
 from .templating import RendererFactory
 from .routing import lookup_controller, NonCanonicalPath
-from .util import _cfg, encode_if_needed, getargspec
+from .util import _cfg, getargspec
 from .middleware.recursive import ForwardRequestException
 
 if six.PY3:
@@ -399,7 +399,7 @@ class PecanBase(object):
         if argspec[2]:
             for name, value in six.iteritems(all_params):
                 if name not in argspec[0]:
-                    kwargs[encode_if_needed(name)] = value
+                    kwargs[name] = value
 
         return args, varargs, kwargs
 

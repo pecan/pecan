@@ -8,10 +8,7 @@ from six import b as b_
 from pecan.compat import urlopen, URLError
 from pecan.tests import PecanTestCase
 
-if sys.version_info < (2, 7):
-    import unittest2 as unittest
-else:
-    import unittest  # noqa
+import unittest
 
 
 if __name__ == '__main__':
