@@ -157,7 +157,7 @@ class TestConf(PecanTestCase):
 
             try:
                 configuration.conf_from_file(f.name)
-            except (ValueError, SystemError) as e:
+            except (ValueError, SystemError, ImportError) as e:
                 assert 'relative import' in str(e)
             else:
                 raise AssertionError(

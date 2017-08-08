@@ -1,21 +1,23 @@
 language: python
+python: 3.6
 cache: pip
-services:
-  - mongodb
 
 env:
   - TOXENV=py27
   - TOXENV=py33
   - TOXENV=py34
   - TOXENV=py35
+  - TOXENV=py36
   - TOXENV=scaffolds-27
   - TOXENV=scaffolds-33
   - TOXENV=scaffolds-34
   - TOXENV=scaffolds-35
+  - TOXENV=scaffolds-36
   - TOXENV=scaffolds-27-rest-api
   - TOXENV=scaffolds-33-rest-api
   - TOXENV=scaffolds-34-rest-api
   - TOXENV=scaffolds-35-rest-api
+  - TOXENV=scaffolds-36-rest-api
   - TOXENV=pypy
   - TOXENV=pep8
 
