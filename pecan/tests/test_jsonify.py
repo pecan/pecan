@@ -1,9 +1,6 @@
 from datetime import datetime, date
 from decimal import Decimal
-try:
-    from simplejson import loads
-except:
-    from json import loads  # noqa
+from json import loads
 try:
     from sqlalchemy import orm, schema, types
     from sqlalchemy.engine import create_engine

@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from json import dumps, loads
 import unittest
 import struct
 import sys
 import warnings
-
-try:
-    from simplejson import dumps, loads
-except:
-    from json import dumps, loads  # noqa
 
 from six import b as b_, PY3
 from webtest import TestApp
