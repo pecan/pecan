@@ -1,10 +1,6 @@
-try:
-    from simplejson import JSONEncoder
-except ImportError:                     # pragma: no cover
-    from json import JSONEncoder        # noqa
-
 from datetime import datetime, date
 from decimal import Decimal
+from json import JSONEncoder
 
 # depending on the version WebOb might have 2 types of dicts
 try:

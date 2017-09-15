@@ -1,8 +1,5 @@
+from json import dumps
 from webtest import TestApp
-try:
-    from simplejson import dumps
-except:
-    from json import dumps  # noqa
 
 from six import b as b_
 

@@ -15,14 +15,6 @@ with open('requirements.txt') as reqs:
     ]
 
 try:
-    import json  # noqa
-except:
-    try:
-        import simplejson  # noqa
-    except:
-        requirements.append("simplejson >= 2.1.1")
-
-try:
     from functools import singledispatch  # noqa
 except:
     #

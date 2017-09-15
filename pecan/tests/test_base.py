@@ -1922,11 +1922,6 @@ class TestEngines(PecanTestCase):
         assert 'support for "mako3" was not found;' in str(expected)
 
     def test_json(self):
-        try:
-            from simplejson import loads
-        except:
-            from json import loads  # noqa
-
         expected_result = dict(
             name='Jonathan',
             age=30, nested=dict(works=True)
@@ -1940,7 +1935,7 @@ class TestEngines(PecanTestCase):
         app = TestApp(Pecan(RootController()))
         r = app.get('/')
         assert r.status_int == 200
-        result = dict(loads(r.body.decode()))
+        result = json.loads(r.body.decode())
         assert result == expected_result
 
     def test_custom_renderer(self):
