@@ -1,42 +1,47 @@
 language: python
-python: 3.6
+matrix:
+  include:
+    - python: 2.7
+      env: TOXENV=py27
+    - python: 2.7
+      env: TOXENV=scaffolds-27
+    - python: 2.7
+      env: TOXENV=scaffolds-27-rest-api
+    - python: 3.3
+      env: TOXENV=py33
+    - python: 3.3
+      env: TOXENV=scaffolds-33
+    - python: 3.3
+      env: TOXENV=scaffolds-33-rest-api
+    - python: 3.4
+      env: TOXENV=py34
+    - python: 3.4
+      env: TOXENV=scaffolds-34
+    - python: 3.4
+      env: TOXENV=scaffolds-34-rest-api
+    - python: 3.5
+      env: TOXENV=py35
+    - python: 3.5
+      env: TOXENV=scaffolds-35
+    - python: 3.5
+      env: TOXENV=scaffolds-35-rest-api
+    - python: 3.6
+      env: TOXENV=py36
+    - python: pypy
+      env: TOXENV=pypy
+    - env: TOXENV=pep8
 cache: pip
-
-env:
-  - TOXENV=py27
-  - TOXENV=py33
-  - TOXENV=py34
-  - TOXENV=py35
-  - TOXENV=py36
-  - TOXENV=scaffolds-27
-  - TOXENV=scaffolds-33
-  - TOXENV=scaffolds-34
-  - TOXENV=scaffolds-35
-  - TOXENV=scaffolds-36
-  - TOXENV=scaffolds-27-rest-api
-  - TOXENV=scaffolds-33-rest-api
-  - TOXENV=scaffolds-34-rest-api
-  - TOXENV=scaffolds-35-rest-api
-  - TOXENV=scaffolds-36-rest-api
-  - TOXENV=pypy
-  - TOXENV=pep8
 
 install:
   - travis_retry pip install tox
 
 script:
-  - travis_wait tox
+  - tox
 
 addons:
-  apt:
-    sources:
-      - deadsnakes
-    packages:
-      - pypy
-      - python3.3
-      - python3.3-dev
-      - python3.5
-      - python3.5-dev
+  - apt:
+      packages:
+        -libpython3.6-dev
 
 notifications:
   irc:
