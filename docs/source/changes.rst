@@ -1,3 +1,9 @@
+1.3.1
+=====
+* pinned webob to <1.8 due to breaking changes in Accept header parsing
+  (https://github.com/pecan/pecan/pull/97)
+  (https://github.com/Pylons/webob/pull/338)
+
 1.3.0
 =====
 * pecan is now officially supported for Python 3.6
