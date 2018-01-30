@@ -480,7 +480,7 @@ class PecanBase(object):
         if not pecan_state['content_type']:
             # attempt to find a best match based on accept headers (if they
             # exist)
-            accept = getattr(req.accept, 'header_value', '*/*')
+            accept = getattr(req.accept, 'header_value', '*/*') or '*/*'
             if accept == '*/*' or (
                     accept.startswith('text/html,') and
                     list(content_types.keys()) in self.SIMPLEST_CONTENT_TYPES):
@@ -686,7 +686,7 @@ class PecanBase(object):
             if isinstance(e, exc.HTTPException):
                 # if the client asked for JSON, do our best to provide it
                 best_match = acceptparse.MIMEAccept(
-                    getattr(req.accept, 'header_value', '*/*')
+                    getattr(req.accept, 'header_value', '*/*') or '*/*'
                 ).best_match(('text/plain', 'text/html', 'application/json'))
                 state.response = e
                 if best_match == 'application/json':

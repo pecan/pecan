@@ -1529,6 +1529,13 @@ class TestContentTypeByAcceptHeaders(PecanTestCase):
 
         return TestApp(Pecan(RootController()))
 
+    def test_missing_accept(self):
+        r = self.app_.get('/', headers={
+            'Accept': ''
+        })
+        assert r.status_int == 200
+        assert r.content_type == 'text/html'
+
     def test_quality(self):
         r = self.app_.get('/', headers={
             'Accept': 'text/html,application/json;q=0.9,*/*;q=0.8'
