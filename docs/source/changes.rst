@@ -1,3 +1,8 @@
+1.3.2
+=====
+* pecan now works with webob < and > 1.8
+  (https://github.com/pecan/pecan/pull/99)
+
 1.3.1
 =====
 * pinned webob to <1.8 due to breaking changes in Accept header parsing
