@@ -221,10 +221,11 @@ the project (alongside ``setup.py``), so that we can describe how our example
 application should be served. This is how the script (named ``run.py``) looks::
 
     import os
-    import cherrypy
-    from cherrypy import wsgiserver
 
-    from pecan import deploy
+    import cherrypy
+    from cheroot import wsgi
+    from cheroot.wsgi import PathInfoDispatcher
+    from pecan.deploy import deploy
 
     simpleapp_wsgi_app = deploy('/path/to/production_config.py')
 
@@ -251,20 +252,18 @@ application should be served. This is how the script (named ``run.py``) looks::
         return cherrypy.tree.mount(Root(), '/', config=configuration)
 
     # Assuming your app has media on different paths, like 'css', and 'images'
-    application = wsgiserver.WSGIPathInfoDispatcher({
+    application = PathInfoDispatcher({
         '/': simpleapp_wsgi_app,
         '/css': make_static_config('css'),
         '/images': make_static_config('images')
-        }
-    )
+    })
 
-    server = wsgiserver.CherryPyWSGIServer(('0.0.0.0', 8080), application,
-    server_name='simpleapp')
+    server = wsgi.Server(('0.0.0.0', 8080), application, server_name='simpleapp')
 
     try:
         server.start()
     except KeyboardInterrupt:
-        print "Terminating server..."
+        print("Terminating server...")
         server.stop()
 
 To start the server, simply call it with the Python executable::
