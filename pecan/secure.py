@@ -84,7 +84,7 @@ class _SecuredAttribute(object):
     @_secure_method('_check_permissions')
     @expose()
     def _lookup(self, *remainder):
-        return self.obj, remainder
+        return self.obj, list(remainder)
 
 
 # helper for secure decorator
