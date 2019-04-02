@@ -1,3 +1,9 @@
+1.3.3
+=====
+* fixed a bug in RestController that incorrectly routed certain @secure
+  requests (https://github.com/pecan/pecan/pull/105)
+* removed official support for Python 3.3
+
 1.3.2
 =====
 * pecan now works with webob < and > 1.8
