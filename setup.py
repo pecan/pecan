@@ -33,6 +33,7 @@ except:
     except:
         requirements.append('ordereddict')
 
+
 tests_require = requirements + test_requirements
 
 if sys.version_info < (3, 0):
