@@ -14,6 +14,12 @@ with open('requirements.txt') as reqs:
         if (line and not line.startswith('-'))
     ]
 
+with open('test-requirements.txt') as reqs:
+    test_requirements = [
+        line for line in reqs.read().split('\n')
+        if (line and not line.startswith('-'))
+    ]
+
 try:
     from functools import singledispatch  # noqa
 except:
@@ -28,13 +34,7 @@ except:
         requirements.append('ordereddict')
 
 
-tests_require = requirements + [
-    'virtualenv',
-    'Jinja2',
-    'gunicorn',
-    'mock',
-    'sqlalchemy'
-]
+tests_require = requirements + test_requirements
 
 if sys.version_info < (3, 0):
     # These don't support Python3 yet - don't run their tests

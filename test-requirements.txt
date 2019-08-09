@@ -1,0 +1,7 @@
+gunicorn
+Jinja2
+mock
+pep8
+sqlalchemy
+uwsgi
+virtualenv
