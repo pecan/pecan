@@ -1,0 +1,8 @@
+gunicorn
+Jinja2
+mock
+pep8
+sqlalchemy
+uwsgi
+virtualenv
+WebTest>=1.3.1
