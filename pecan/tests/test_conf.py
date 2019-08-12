@@ -21,6 +21,16 @@ class TestConf(PecanTestCase):
         bad_dict = {'bad name': 'value'}
         self.assertRaises(ValueError, configuration.Config, bad_dict)
 
+    def test_update_config_fail_message(self):
+        """When failing, the __force_dict__ key is suggested"""
+        from pecan import configuration
+        bad_dict = {'bad name': 'value'}
+
+        try:
+            configuration.Config(bad_dict)
+        except ValueError as error:
+            assert "consider using the '__force_dict__'" in str(error)
+
     def test_update_set_config(self):
         """Update an empty configuration with the default values"""
         from pecan import configuration
