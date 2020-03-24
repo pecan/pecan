@@ -1,6 +1,5 @@
 gunicorn
-Jinja2
-mock
+Jinja2<3  # >= 3 not compatible py35
 pep8
 sqlalchemy
 uwsgi

@@ -5,10 +5,10 @@ import os
 import json
 import traceback
 import warnings
+from unittest import mock
 
 import webob
 from webob.exc import HTTPNotFound
-import mock
 from webtest import TestApp
 import six
 from six import b as b_

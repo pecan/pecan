@@ -1,12 +1,12 @@
 import time
 from json import dumps, loads
 import warnings
+from unittest import mock
 
 from webtest import TestApp
 from six import b as b_
 from six import u as u_
 import webob
-import mock
 
 from pecan import Pecan, expose, abort, Request, Response
 from pecan.rest import RestController
