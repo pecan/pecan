@@ -69,7 +69,10 @@ class Config(object):
 
         for k, v in iterator:
             if not IDENTIFIER.match(k):
-                raise ValueError('\'%s\' is not a valid indentifier' % k)
+                msg = ("'%s' is not a valid Python identifier,"
+                       "consider using the '__force_dict__' key if requiring "
+                       "a native dictionary")
+                raise ValueError(msg % k)
 
             cur_val = self.__values__.get(k)
 
