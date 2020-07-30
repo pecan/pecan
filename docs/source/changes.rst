@@ -1,3 +1,10 @@
+1.4.0
+=====
+* pecan now requires webob >= 1.8
+* fixed a bug when parsing certain Accept headers
+  (https://github.com/Pylons/webob/issues/403)
+* removed official support for Python 3.5
+
 1.3.3
 =====
 * fixed a bug in RestController that incorrectly routed certain @secure
