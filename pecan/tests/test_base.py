@@ -1549,6 +1549,13 @@ class TestContentTypeByAcceptHeaders(PecanTestCase):
         assert r.status_int == 200
         assert r.content_type == 'application/json'
 
+    def test_discarded_accept_parameters(self):
+        r = self.app_.get('/', headers={
+            'Accept': 'application/json;discard=me'
+        })
+        assert r.status_int == 200
+        assert r.content_type == 'application/json'
+
     def test_file_extension_has_higher_precedence(self):
         r = self.app_.get('/index.html', headers={
             'Accept': 'application/json,text/html;q=0.9,*/*;q=0.8'

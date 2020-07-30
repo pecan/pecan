@@ -489,11 +489,21 @@ class PecanBase(object):
                     'text/html'
                 )
             else:
-                best_default = acceptparse.MIMEAccept(
-                    accept
-                ).best_match(
-                    content_types.keys()
+                best_default = None
+                accept_header = acceptparse.create_accept_header(accept)
+                offers = accept_header.acceptable_offers(
+                    list(content_types.keys())
                 )
+                if offers:
+                    # If content type matches exactly use matched type
+                    best_default = offers[0][0]
+                else:
+                    # If content type doesn't match exactly see if something
+                    # matches when not using parameters
+                    for k in content_types.keys():
+                        if accept.startswith(k):
+                            best_default = k
+                            break
 
                 if best_default is None:
                     msg = "Controller '%s' defined does not support " + \
@@ -685,9 +695,11 @@ class PecanBase(object):
             # if this is an HTTP Exception, set it as the response
             if isinstance(e, exc.HTTPException):
                 # if the client asked for JSON, do our best to provide it
-                best_match = acceptparse.MIMEAccept(
-                    getattr(req.accept, 'header_value', '*/*') or '*/*'
-                ).best_match(('text/plain', 'text/html', 'application/json'))
+                accept_header = acceptparse.create_accept_header(
+                    getattr(req.accept, 'header_value', '*/*') or '*/*')
+                offers = accept_header.acceptable_offers(
+                    ('text/plain', 'text/html', 'application/json'))
+                best_match = offers[0][0] if offers else None
                 state.response = e
                 if best_match == 'application/json':
                     json_body = dumps({
