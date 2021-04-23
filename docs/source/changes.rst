@@ -1,3 +1,10 @@
+1.4.1
+=====
+
+* added trove classifiers for Python 3.6 - 3.9
+* fixed a bug related to setuptools as a dependency
+  (https://github.com/pecan/pecan/pull/122)
+
 1.4.0
 =====
 * pecan now requires webob >= 1.8
