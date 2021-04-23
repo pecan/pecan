@@ -117,27 +117,6 @@ if __name__ == '__main__':
             finally:
                 proc.terminate()
 
-    class TestGunicornServeCommand(TestThirdPartyServe):
-
-        def test_serve_from_config(self):
-            # Start the server
-            proc = subprocess.Popen([
-                os.path.join(self.bin, 'gunicorn_pecan'),
-                'testing123/config.py'
-            ])
-
-            self.poll_http('gunicorn', proc, 8080)
-
-        def test_serve_with_custom_bind(self):
-            # Start the server
-            proc = subprocess.Popen([
-                os.path.join(self.bin, 'gunicorn_pecan'),
-                '--bind=0.0.0.0:9191',
-                'testing123/config.py'
-            ])
-
-            self.poll_http('gunicorn', proc, 9191)
-
     class TestUWSGIServiceCommand(TestThirdPartyServe):
 
         def test_serve_from_config(self):
