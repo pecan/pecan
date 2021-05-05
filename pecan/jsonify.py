@@ -39,10 +39,10 @@ except ImportError:  # pragma no cover
     # dummy classes since we don't have SQLAlchemy installed
     # or we're using SQLAlchemy < 1.4
 
-    class ResultProxy(object):  # noqa
+    class LegacyCursorResult(object):  # noqa
         pass
 
-    class RowProxy(object):  # noqa
+    class LegacyRow(object):  # noqa
         pass
 
 
