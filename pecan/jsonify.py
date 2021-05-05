@@ -33,6 +33,19 @@ except ImportError:  # pragma no cover
             pass
 
 
+try:
+    from sqlalchemy.engine.cursor import LegacyCursorResult, LegacyRow
+except ImportError:  # pragma no cover
+    # dummy classes since we don't have SQLAlchemy installed
+    # or we're using SQLAlchemy < 1.4
+
+    class LegacyCursorResult(object):  # noqa
+        pass
+
+    class LegacyRow(object):  # noqa
+        pass
+
+
 #
 # encoders
 #
@@ -100,6 +113,11 @@ class GenericJSON(JSONEncoder):
             if props['count'] < 0:
                 props['count'] = len(props['rows'])
             return props
+        elif isinstance(obj, LegacyCursorResult):
+            rows = [dict(row._mapping) for row in obj.fetchall()]
+            return {'count': len(rows), 'rows': rows}
+        elif isinstance(obj, LegacyRow):
+            return dict(obj._mapping)
         elif isinstance(obj, RowProxy):
             return dict(obj)
         elif isinstance(obj, webob_dicts):
