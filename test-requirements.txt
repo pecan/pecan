@@ -1,6 +1,6 @@
 gunicorn
 Jinja2<3  # >= 3 not compatible py35
 pep8
-sqlalchemy<1.4
+sqlalchemy
 uwsgi
 virtualenv

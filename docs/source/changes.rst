@@ -4,6 +4,8 @@
 * added trove classifiers for Python 3.6 - 3.9
 * fixed a bug related to setuptools as a dependency
   (https://github.com/pecan/pecan/pull/122)
+* fixed a bug that broke pecan when used with certain versions of
+  SQLAlchemy (https://github.com/pecan/pecan/pulls)
 
 1.4.0
 =====
