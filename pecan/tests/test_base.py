@@ -456,8 +456,12 @@ class TestControllerArguments(PecanTestCase):
             assert type(ex) == TypeError
             assert ex.args[0] in (
                 "index() takes exactly 2 arguments (1 given)",
-                "index() missing 1 required positional argument: 'id'"
-            )  # this messaging changed in Python 3.3
+                "index() missing 1 required positional argument: 'id'",
+                (
+                    "TestControllerArguments.app_.<locals>.RootController."
+                    "index() missing 1 required positional argument: 'id'"
+                ),
+            )  # this messaging changed in Python 3.3 and again in Python 3.10
 
     def test_single_argument(self):
         r = self.app_.get('/1')
@@ -994,9 +998,13 @@ class TestControllerArguments(PecanTestCase):
         except Exception as ex:
             assert type(ex) == TypeError
             assert ex.args[0] in (
-                "eater() takes at least 2 arguments (1 given)",
-                "eater() missing 1 required positional argument: 'id'"
-            )  # this messaging changed in Python 3.3
+                "eater() takes exactly 2 arguments (1 given)",
+                "eater() missing 1 required positional argument: 'id'",
+                (
+                    "TestControllerArguments.app_.<locals>.RootController."
+                    "eater() missing 1 required positional argument: 'id'"
+                ),
+            )  # this messaging changed in Python 3.3 and again in Python 3.10
 
     def test_one_remainder(self):
         r = self.app_.get('/eater/1')
