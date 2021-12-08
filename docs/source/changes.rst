@@ -1,6 +1,7 @@
 1.4.1
 =====
 
+* add support for Python 3.10
 * added trove classifiers for Python 3.6 - 3.9
 * fixed a bug related to setuptools as a dependency
   (https://github.com/pecan/pecan/pull/122)
