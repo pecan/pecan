@@ -55,5 +55,4 @@ https://github.com/pecan/pecan/issues/new
 Additional Help/Support
 -----------------------
 Most Pecan interaction is done via the `pecan-dev Mailing List
-<https://groups.google.com/forum/#!forum/pecan-dev>`_ and the #pecanpy channel
-on `FreeNode <http://freenode.net/>`_ IRC.
+<https://groups.google.com/forum/#!forum/pecan-dev>`_.
