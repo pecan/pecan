@@ -1,6 +1,5 @@
 import os
 from pecan import load_app
-from webtest import TestApp
 
 
 def load_test_app(config=None, **kwargs):
@@ -33,6 +32,9 @@ def load_test_app(config=None, **kwargs):
         resp = app.get('/path/to/some/resource').status_int
         assert resp.status_int == 200
     """
+    # Only import at runtime, since this is a relatively heavy-weight
+    # dependency:
+    from webtest import TestApp
     return TestApp(load_app(config, **kwargs))
 
 

@@ -2,7 +2,10 @@
 Shell command for Pecan.
 """
 from pecan.commands import BaseCommand
-from webtest import TestApp
+try:
+    from webtest import TestApp
+except ImportError:
+    TestApp = None
 from warnings import warn
 import sys
 
@@ -118,7 +121,8 @@ class ShellCommand(BaseCommand):
         # prepare the locals
         locs = dict(__name__='pecan-admin')
         locs['wsgiapp'] = app
-        locs['app'] = TestApp(app)
+        if TestApp:
+            locs['app'] = TestApp(app)
 
         model = self.load_model(app.config)
         if model:
@@ -136,7 +140,8 @@ class ShellCommand(BaseCommand):
         banner = '  The following objects are available:\n'
         banner += '  %-10s - This project\'s WSGI App instance\n' % 'wsgiapp'
         banner += '  %-10s - The current configuration\n' % 'conf'
-        banner += '  %-10s - webtest.TestApp wrapped around wsgiapp\n' % 'app'
+        if TestApp:
+            banner += '  %-10s - webtest.TestApp wrapped around wsgiapp\n' % 'app'
         if model:
             model_name = getattr(
                 model,
