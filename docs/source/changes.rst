@@ -1,3 +1,8 @@
+1.4.2
+=====
+
+* pecan no longer depends on webtest (https://github.com/pecan/pecan/issues/139)
+
 1.4.1
 =====
 
