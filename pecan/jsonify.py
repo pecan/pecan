@@ -12,26 +12,26 @@ except ImportError:  # pragma no cover
     from webob.multidict import MultiDict
     webob_dicts = (MultiDict,)
 
-import six
 try:
     from functools import singledispatch
 except ImportError:  # pragma: no cover
     from singledispatch import singledispatch
 
 try:
-    from sqlalchemy.engine.result import ResultProxy, RowProxy
-except ImportError:  # pragma no cover
+    import sqlalchemy  # noqa
     try:
-        from sqlalchemy.engine.base import ResultProxy, RowProxy
-    except ImportError:  # pragma no cover
-        # dummy classes since we don't have SQLAlchemy installed
+        # SQLAlchemy 2.0 support
+        from sqlalchemy.engine import CursorResult as ResultProxy
+        from sqlalchemy.engine import Row as RowProxy
+    except ImportError:
+        from sqlalchemy.engine.result import ResultProxy, RowProxy
+except ImportError:
+    # dummy classes since we don't have SQLAlchemy installed
+    class ResultProxy(object):  # noqa
+        pass
 
-        class ResultProxy(object):  # noqa
-            pass
-
-        class RowProxy(object):  # noqa
-            pass
-
+    class RowProxy(object):  # noqa
+        pass
 
 try:
     from sqlalchemy.engine.cursor import LegacyCursorResult, LegacyRow
@@ -93,7 +93,7 @@ class GenericJSON(JSONEncoder):
             returns webob_dicts.mixed() dictionary, which is guaranteed
             to be JSON-friendly.
         '''
-        if hasattr(obj, '__json__') and six.callable(obj.__json__):
+        if hasattr(obj, '__json__') and callable(obj.__json__):
             return obj.__json__()
         elif isinstance(obj, (date, datetime)):
             return str(obj)
@@ -119,6 +119,9 @@ class GenericJSON(JSONEncoder):
         elif isinstance(obj, LegacyRow):
             return dict(obj._mapping)
         elif isinstance(obj, RowProxy):
+            if obj.__class__.__name__ == 'Row':
+                # SQLAlchemy 2.0 support
+                obj = obj._mapping
             return dict(obj)
         elif isinstance(obj, webob_dicts):
             return obj.mixed()

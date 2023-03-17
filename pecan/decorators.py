@@ -1,6 +1,4 @@
-from inspect import getmembers, isclass, ismethod, isfunction
-
-import six
+from inspect import getmembers, isclass, isfunction
 
 from .util import _cfg, getargspec
 
@@ -109,7 +107,7 @@ def transactional(ignore_redirects=True):
         if isclass(f):
             for meth in [
                 m[1] for m in getmembers(f)
-                if (isfunction if six.PY3 else ismethod)(m[1])
+                if isfunction(m[1])
             ]:
                 if getattr(meth, 'exposed', False):
                     _cfg(meth)['transactional'] = True

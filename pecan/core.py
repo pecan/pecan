@@ -7,13 +7,11 @@ import operator
 import sys
 import types
 
-import six
-
 from webob import (Request as WebObRequest, Response as WebObResponse, exc,
                    acceptparse)
 from webob.multidict import NestedMultiDict
 
-from .compat import urlparse, izip
+from .compat import urlparse, izip, is_bound_method as ismethod
 from .jsonify import encode as dumps
 from .secure import handle_security
 from .templating import RendererFactory
@@ -21,10 +19,6 @@ from .routing import lookup_controller, NonCanonicalPath
 from .util import _cfg, getargspec
 from .middleware.recursive import ForwardRequestException
 
-if six.PY3:
-    from .compat import is_bound_method as ismethod
-else:
-    from inspect import ismethod
 
 # make sure that json is defined in mimetypes
 add_type('application/json', '.json', True)
@@ -130,12 +124,7 @@ def abort(status_code, detail='', headers=None, comment=None, **kw):
             comment=comment,
             **kw
         )
-
-        if six.PY3:
-            raise webob_exception.with_traceback(traceback)
-        else:
-            # Using exec to avoid python 3 parsers from crashing
-            exec('raise webob_exception, None, traceback')
+        raise webob_exception.with_traceback(traceback)
     finally:
         # Per the suggestion of the Python docs, delete the traceback object
         del traceback
@@ -236,7 +225,7 @@ class PecanBase(object):
                  force_canonical=True, guess_content_type_from_ext=True,
                  context_local_factory=None, request_cls=Request,
                  response_cls=Response, **kw):
-        if isinstance(root, six.string_types):
+        if isinstance(root, str):
             root = self.__translate_root__(root)
 
         self.root = root
@@ -246,7 +235,7 @@ class PecanBase(object):
         self.default_renderer = default_renderer
 
         # pre-sort these so we don't have to do it per-request
-        if six.callable(hooks):
+        if callable(hooks):
             hooks = hooks()
 
         self.hooks = list(sorted(
@@ -275,7 +264,7 @@ class PecanBase(object):
             module = __import__(name, fromlist=fromlist)
             kallable = getattr(module, parts[-1])
             msg = "%s does not represent a callable class or function."
-            if not six.callable(kallable):
+            if not callable(kallable):
                 raise TypeError(msg % item)
             return kallable()
 
@@ -397,7 +386,7 @@ class PecanBase(object):
 
         # handle wildcard GET/POST params
         if argspec[2]:
-            for name, value in six.iteritems(all_params):
+            for name, value in iter(all_params.items()):
                 if name not in argspec[0]:
                     kwargs[name] = value
 
@@ -466,7 +455,7 @@ class PecanBase(object):
         # handle generic controllers
         im_self = None
         if cfg.get('generic'):
-            im_self = six.get_method_self(controller)
+            im_self = controller.__self__
             handlers = cfg['generic_handlers']
             controller = handlers.get(req.method, handlers['DEFAULT'])
             handle_security(controller, im_self)
@@ -622,7 +611,7 @@ class PecanBase(object):
             testing_variables['controller_output'] = result
 
         # set the body content
-        if result and isinstance(result, six.text_type):
+        if result and isinstance(result, str):
             resp.text = result
         elif result:
             resp.body = result
@@ -707,7 +696,7 @@ class PecanBase(object):
                         'title': e.title,
                         'description': e.detail
                     })
-                    if isinstance(json_body, six.text_type):
+                    if isinstance(json_body, str):
                         e.text = json_body
                     else:
                         e.body = json_body

@@ -10,8 +10,6 @@ import mimetypes
 from datetime import datetime
 from time import gmtime
 
-import six
-
 
 class FileWrapper(object):
     """This class can be used to convert a :class:`file`-like object into
@@ -37,15 +35,11 @@ class FileWrapper(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         data = self.file.read(self.buffer_size)
         if data:
             return data
         raise StopIteration()
-
-
-if six.PY3:
-    FileWrapper.__next__ = FileWrapper.next
 
 
 def wrap_file(environ, file, buffer_size=8192):
