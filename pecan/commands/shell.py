@@ -141,7 +141,7 @@ class ShellCommand(BaseCommand):
         banner += '  %-10s - This project\'s WSGI App instance\n' % 'wsgiapp'
         banner += '  %-10s - The current configuration\n' % 'conf'
         if TestApp:
-            banner += '  %-10s - webtest.TestApp wrapped around wsgiapp\n' % 'app'
+            banner += '  %-10s - webtest.TestApp wrapped around wsgiapp\n' % 'app'  # noqa
         if model:
             model_name = getattr(
                 model,

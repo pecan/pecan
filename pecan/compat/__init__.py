@@ -1,23 +1,14 @@
 import inspect
 
-import six
-
-if six.PY3:
-    import urllib.parse as urlparse
-    from urllib.parse import quote, unquote_plus
-    from urllib.request import urlopen, URLError
-    from html import escape
-    izip = zip
-else:
-    import urlparse  # noqa
-    from urllib import quote, unquote_plus  # noqa
-    from urllib2 import urlopen, URLError  # noqa
-    from cgi import escape  # noqa
-    from itertools import izip
+import urllib.parse as urlparse  # noqa
+from urllib.parse import quote, unquote_plus  # noqa
+from urllib.request import urlopen, URLError  # noqa
+from html import escape  # noqa
+izip = zip
 
 
 def is_bound_method(ob):
-    return inspect.ismethod(ob) and six.get_method_self(ob) is not None
+    return inspect.ismethod(ob) and ob.__self__ is not None
 
 
 def getargspec(func):

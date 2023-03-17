@@ -2,13 +2,7 @@ import re
 import inspect
 import os
 import sys
-
-import six
-
-if six.PY3:
-    from importlib.machinery import SourceFileLoader
-else:
-    import imp
+from importlib.machinery import SourceFileLoader
 
 
 IDENTIFIER = re.compile(r'[a-z_](\w)*$', re.IGNORECASE)
@@ -63,7 +57,7 @@ class Config(object):
         '''
 
         if isinstance(conf_dict, dict):
-            iterator = six.iteritems(conf_dict)
+            iterator = iter(conf_dict.items())
         else:
             iterator = iter(conf_dict)
 
@@ -134,14 +128,14 @@ class Config(object):
                 self.__values__[key] = ConfigDict(value)
             else:
                 self.__values__[key] = Config(value, filename=self.__file__)
-        elif isinstance(value, six.string_types) and '%(confdir)s' in value:
+        elif isinstance(value, str) and '%(confdir)s' in value:
             confdir = os.path.dirname(self.__file__) or os.getcwd()
             self.__values__[key] = value.replace('%(confdir)s', confdir)
         else:
             self.__values__[key] = value
 
     def __iter__(self):
-        return six.iteritems(self.__values__)
+        return iter(self.__values__.items())
 
     def __dir__(self):
         """
@@ -174,13 +168,7 @@ def conf_from_file(filepath):
     # This provides more verbose import-related error reporting than exec()
     absname, _ = os.path.splitext(abspath)
     basepath, module_name = absname.rsplit(os.sep, 1)
-    if six.PY3:
-        SourceFileLoader(module_name, abspath).load_module(module_name)
-    else:
-        imp.load_module(
-            module_name,
-            *imp.find_module(module_name, [basepath])
-        )
+    SourceFileLoader(module_name, abspath).load_module(module_name)
 
     # If we were able to import as a module, actually exec the compiled code
     exec(compiled, globals(), conf_dict)
@@ -215,7 +203,7 @@ def conf_from_dict(conf_dict):
     '''
     conf = Config(filename=conf_dict.get('__file__', ''))
 
-    for k, v in six.iteritems(conf_dict):
+    for k, v in iter(conf_dict.items()):
         if k.startswith('__'):
             continue
         elif inspect.ismodule(v):
@@ -248,7 +236,7 @@ def set_config(config, overwrite=False):
     if overwrite is True:
         _runtime_conf.empty()
 
-    if isinstance(config, six.string_types):
+    if isinstance(config, str):
         config = conf_from_file(config)
         _runtime_conf.update(config)
         if config.__file__:

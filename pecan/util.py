@@ -1,7 +1,3 @@
-import sys
-
-import six
-
 from pecan.compat import getargspec as _getargspec
 
 
@@ -22,7 +18,7 @@ def getargspec(method):
     if hasattr(method, '__func__'):
         method = method.__func__
 
-    func_closure = six.get_function_closure(method)
+    func_closure = method.__closure__
 
     # NOTE(sileht): if the closure is None we cannot look deeper,
     # so return actual argspec, this occurs when the method
@@ -37,7 +33,7 @@ def getargspec(method):
     # (has a __code__ object, and 'self' is the first argument)
     func_closure = filter(
         lambda c: (
-            six.callable(c.cell_contents) and
+            callable(c.cell_contents) and
             hasattr(c.cell_contents, '__code__')
         ),
         func_closure
