@@ -1,7 +1,6 @@
 import sys
 import unittest
 
-from six import b as b_
 from webtest import TestApp
 
 from pecan import expose, make_app
@@ -56,11 +55,11 @@ class TestSecure(PecanTestCase):
         ))
         response = app.get('/')
         assert response.status_int == 200
-        assert response.body == b_('Hello, World!')
+        assert response.body == b'Hello, World!'
 
         response = app.get('/unlocked')
         assert response.status_int == 200
-        assert response.body == b_('Sure thing')
+        assert response.body == b'Sure thing'
 
         response = app.get('/locked', expect_errors=True)
         assert response.status_int == 401
@@ -70,7 +69,7 @@ class TestSecure(PecanTestCase):
 
         response = app.get('/secret/allowed')
         assert response.status_int == 200
-        assert response.body == b_('Allowed!')
+        assert response.body == b'Allowed!'
 
     def test_unlocked_attribute(self):
         class AuthorizedSubController(object):
@@ -118,11 +117,11 @@ class TestSecure(PecanTestCase):
         ))
         response = app.get('/')
         assert response.status_int == 200
-        assert response.body == b_('Hello, World!')
+        assert response.body == b'Hello, World!'
 
         response = app.get('/unlocked')
         assert response.status_int == 200
-        assert response.body == b_('Sure thing')
+        assert response.body == b'Sure thing'
 
         response = app.get('/locked', expect_errors=True)
         assert response.status_int == 401
@@ -132,15 +131,15 @@ class TestSecure(PecanTestCase):
 
         response = app.get('/secret/allowed')
         assert response.status_int == 200
-        assert response.body == b_('Allowed!')
+        assert response.body == b'Allowed!'
 
         response = app.get('/secret/authorized/')
         assert response.status_int == 200
-        assert response.body == b_('Index')
+        assert response.body == b'Index'
 
         response = app.get('/secret/authorized/allowed')
         assert response.status_int == 200
-        assert response.body == b_('Allowed!')
+        assert response.body == b'Allowed!'
 
     def test_secure_attribute(self):
         authorized = False
@@ -160,7 +159,7 @@ class TestSecure(PecanTestCase):
         app = TestApp(make_app(RootController()))
         response = app.get('/')
         assert response.status_int == 200
-        assert response.body == b_('Hello from root!')
+        assert response.body == b'Hello from root!'
 
         response = app.get('/sub/', expect_errors=True)
         assert response.status_int == 401
@@ -168,7 +167,7 @@ class TestSecure(PecanTestCase):
         authorized = True
         response = app.get('/sub/')
         assert response.status_int == 200
-        assert response.body == b_('Hello from sub!')
+        assert response.body == b'Hello from sub!'
 
     def test_secured_generic_controller(self):
         authorized = False
@@ -413,7 +412,7 @@ class TestObjectPathSecurity(PecanTestCase):
     def test_sub_of_both_not_secret(self):
         response = self.app.get('/notsecret/hi/')
         assert response.status_int == 200
-        assert response.body == b_('Index hi')
+        assert response.body == b'Index hi'
 
     def test_protected_lookup(self):
         response = self.app.get('/secret/hi/', expect_errors=True)
@@ -422,7 +421,7 @@ class TestObjectPathSecurity(PecanTestCase):
         self.secret_cls.authorized = True
         response = self.app.get('/secret/hi/')
         assert response.status_int == 200
-        assert response.body == b_('Index hi')
+        assert response.body == b'Index hi'
         assert 'secretcontroller' in self.permissions_checked
 
     def test_secured_notfound_lookup(self):
@@ -449,7 +448,7 @@ class TestObjectPathSecurity(PecanTestCase):
         self.deepsecret_cls.authorized = True
         response = self.app.get('/secret/hi/deepsecret/')
         assert response.status_int == 200
-        assert response.body == b_('Deep Secret')
+        assert response.body == b'Deep Secret'
         assert 'secretcontroller' in self.permissions_checked
         assert 'deepsecret' in self.permissions_checked
 
@@ -458,14 +457,14 @@ class TestObjectPathSecurity(PecanTestCase):
         self.deepsecret_cls.authorized = True
         response = self.app.get('/secret/1/deepsecret/2/deepsecret/')
         assert response.status_int == 200
-        assert response.body == b_('Deep Secret')
+        assert response.body == b'Deep Secret'
         assert 'secretcontroller' in self.permissions_checked
         assert 'deepsecret' in self.permissions_checked
 
     def test_unlocked_lookup(self):
         response = self.app.get('/notsecret/1/deepsecret/2/')
         assert response.status_int == 200
-        assert response.body == b_('Index 2')
+        assert response.body == b'Index 2'
         assert 'deepsecret' not in self.permissions_checked
 
         response = self.app.get(
@@ -493,7 +492,7 @@ class TestObjectPathSecurity(PecanTestCase):
         self.secret_cls.independent_authorization = True
         response = self.app.get('/secret/independent')
         assert response.status_int == 200
-        assert response.body == b_('Independent Security')
+        assert response.body == b'Independent Security'
         assert len(self.permissions_checked) == 1
         assert 'independent' in self.permissions_checked
 
@@ -508,7 +507,7 @@ class TestObjectPathSecurity(PecanTestCase):
         self.secret_cls.independent_authorization = True
         response = self.app.get('/secret/wrapped/')
         assert response.status_int == 200
-        assert response.body == b_('Index wrapped')
+        assert response.body == b'Index wrapped'
         assert len(self.permissions_checked) == 1
         assert 'independent' in self.permissions_checked
 
@@ -517,7 +516,7 @@ class TestObjectPathSecurity(PecanTestCase):
         self.secret_cls.independent_authorization = True
         response = self.app.get('/secret/lookup_wrapped/')
         assert response.status_int == 200
-        assert response.body == b_('Index wrapped')
+        assert response.body == b'Index wrapped'
         assert len(self.permissions_checked) == 2
         assert 'independent' in self.permissions_checked
         assert 'secretcontroller' in self.permissions_checked
@@ -525,7 +524,7 @@ class TestObjectPathSecurity(PecanTestCase):
     def test_unlocked_attribute_in_insecure(self):
         response = self.app.get('/notsecret/unlocked/')
         assert response.status_int == 200
-        assert response.body == b_('Index unlocked')
+        assert response.body == b'Index unlocked'
 
 
 class SecureControllerSharedPermissionsRegression(PecanTestCase):

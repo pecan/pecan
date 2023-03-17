@@ -3,8 +3,7 @@ import shutil
 import sys
 import tempfile
 import unittest
-
-from six.moves import cStringIO as StringIO
+from io import StringIO
 
 from pecan.tests import PecanTestCase
 

@@ -1,4 +1,4 @@
-__CONFIG_HELP__ = '''
+__CONFIG_HELP__ = b'''
 <div class="traceback">
   <b>To disable this interface, set </b>
   <a target="window"
@@ -10,18 +10,17 @@ __CONFIG_HELP__ = '''
 
 try:
     import re
-    from six import b
     from backlash.debug import DebuggedApplication
 
     class DebugMiddleware(DebuggedApplication):
 
-        body_re = re.compile(b('(<body[^>]*>)'), re.I)
+        body_re = re.compile(b'(<body[^>]*>)', re.I)
 
         def debug_application(self, environ, start_response):
             for part in super(DebugMiddleware, self).debug_application(
                 environ, start_response
             ):
-                yield self.body_re.sub(b('\g<1>%s' % __CONFIG_HELP__), part)
+                yield self.body_re.sub(b'<1>%s' % __CONFIG_HELP__, part)
 
 
 except ImportError:
@@ -30,7 +29,7 @@ except ImportError:
     from pprint import pformat
 
     from mako.template import Template
-    from six.moves import cStringIO as StringIO
+    from io import StringIO
     from webob import Response
     from webob.exc import HTTPException
 

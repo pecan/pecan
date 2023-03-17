@@ -3,8 +3,6 @@ import sys
 import subprocess
 import time
 
-from six import b as b_
-
 from pecan.compat import urlopen, URLError
 from pecan.tests import PecanTestCase
 
@@ -79,7 +77,7 @@ if __name__ == '__main__':
             self.poll(proc)
 
             out, _ = proc.communicate(
-                b_('{"model" : model, "conf" : conf, "app" : app}')
+                b'{"model" : model, "conf" : conf, "app" : app}'
             )
             assert 'testing123.model' in out.decode(), out
             assert 'Config(' in out.decode(), out

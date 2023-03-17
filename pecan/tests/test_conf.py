@@ -1,9 +1,7 @@
 import os
-import sys
 import tempfile
 import unittest
 
-from six import b as b_
 from webtest import TestApp
 
 import pecan
@@ -148,7 +146,7 @@ class TestConf(PecanTestCase):
     def test_config_with_syntax_error(self):
         from pecan import configuration
         with tempfile.NamedTemporaryFile('wb') as f:
-            f.write(b_('\n'.join(['if false', 'var = 3'])))
+            f.write(b'\n'.join([b'if false', b'var = 3']))
             f.flush()
             configuration.Config({})
 
@@ -161,7 +159,7 @@ class TestConf(PecanTestCase):
     def test_config_with_non_package_relative_import(self):
         from pecan import configuration
         with tempfile.NamedTemporaryFile('wb', suffix='.py') as f:
-            f.write(b_('\n'.join(['from . import variables'])))
+            f.write(b'\n'.join([b'from . import variables']))
             f.flush()
             configuration.Config({})
 
