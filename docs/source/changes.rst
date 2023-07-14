@@ -1,3 +1,10 @@
+1.5.0
+=====
+
+* pecan no longer has a dependency on six (https://github.com/pecan/pecan/issues/144)
+* pecan now supports SQLAlchemy 2.0 (https://github.com/pecan/pecan/issues/143)
+* pecan no longer supports SQLAlchemy 1.3
+
 1.4.2
 =====
 
@@ -108,7 +115,7 @@
   --reload` to avoid extraneous server reloads.
 
 1.0.1
-====
+=====
 * Fixed a bug wherein the file extension for URLs with a trailing slash
   (`file.html` vs `file.html/`) were not correctly guessed, thus resulting in
   incorrect Content-Type headers.

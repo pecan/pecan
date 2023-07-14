@@ -2,7 +2,6 @@ from inspect import ismethod, getmembers
 import warnings
 
 from webob import exc
-import six
 
 from .core import abort
 from .decorators import expose
@@ -49,8 +48,7 @@ class RestController(object):
         # object.__new__ will error if called with extra arguments, and either
         # __new__ is overridden or __init__ is not overridden;
         # https://hg.python.org/cpython/file/78d36d54391c/Objects/typeobject.c#l3034
-        # In PY3, this is actually a TypeError (in PY2, it just raises
-        # a DeprecationWarning)
+        # In PY3, this is a TypeError
         new = super(RestController, cls).__new__
         if new is object.__new__:
             return new(cls)
@@ -182,7 +180,7 @@ class RestController(object):
             self._raise_method_deprecation_warning(self.handle_lookup)
 
         # filter empty strings from the arg list
-        args = list(six.moves.filter(bool, args))
+        args = list(filter(bool, args))
 
         # check for lookup controllers
         lookup = getattr(self, '_lookup', None)
@@ -245,7 +243,7 @@ class RestController(object):
 
     def _handle_unknown_method(self, method, remainder, request=None):
         '''
-        Routes undefined actions (like RESET) to the appropriate controller.
+        Routes undefined actions (like TRACE) to the appropriate controller.
         '''
         if request is None:
             self._raise_method_deprecation_warning(self._handle_unknown_method)
@@ -276,7 +274,7 @@ class RestController(object):
 
         # route to a get_all or get if no additional parts are available
         if not remainder or remainder == ['']:
-            remainder = list(six.moves.filter(bool, remainder))
+            remainder = list(filter(bool, remainder))
             controller = self._find_controller('get_all', 'get')
             if controller:
                 self._handle_bad_rest_arguments(controller, remainder, request)

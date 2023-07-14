@@ -6,7 +6,6 @@ import struct
 import sys
 import warnings
 
-from six import b as b_, PY3
 from webtest import TestApp
 
 from pecan import abort, expose, make_app, response, redirect
@@ -83,8 +82,8 @@ class TestRestController(PecanTestCase):
                 return 'DELETED'
 
             @expose()
-            def reset(self):
-                return 'RESET'
+            def trace(self):
+                return 'TRACE'
 
             @expose()
             def post_options(self):
@@ -107,38 +106,40 @@ class TestRestController(PecanTestCase):
         # test get_all
         r = app.get('/things')
         assert r.status_int == 200
-        assert r.body == b_(dumps(dict(items=ThingsController.data)))
+        assert r.body == dumps(
+            dict(items=ThingsController.data)
+        ).encode('utf-8')
 
         # test get_one
         for i, value in enumerate(ThingsController.data):
             r = app.get('/things/%d' % i)
             assert r.status_int == 200
-            assert r.body == b_(value)
+            assert r.body == value.encode('utf-8')
 
         # test post
         r = app.post('/things', {'value': 'four'})
         assert r.status_int == 302
-        assert r.body == b_('CREATED')
+        assert r.body == b'CREATED'
 
         # make sure it works
         r = app.get('/things/4')
         assert r.status_int == 200
-        assert r.body == b_('four')
+        assert r.body == b'four'
 
         # test edit
         r = app.get('/things/3/edit')
         assert r.status_int == 200
-        assert r.body == b_('EDIT three')
+        assert r.body == b'EDIT three'
 
         # test put
         r = app.put('/things/4', {'value': 'FOUR'})
         assert r.status_int == 200
-        assert r.body == b_('UPDATED')
+        assert r.body == b'UPDATED'
 
         # make sure it works
         r = app.get('/things/4')
         assert r.status_int == 200
-        assert r.body == b_('FOUR')
+        assert r.body == b'FOUR'
 
         # test put with _method parameter and GET
         r = app.get('/things/4?_method=put', {'value': 'FOUR!'}, status=405)
@@ -147,27 +148,27 @@ class TestRestController(PecanTestCase):
         # make sure it works
         r = app.get('/things/4')
         assert r.status_int == 200
-        assert r.body == b_('FOUR')
+        assert r.body == b'FOUR'
 
         # test put with _method parameter and POST
         r = app.post('/things/4?_method=put', {'value': 'FOUR!'})
         assert r.status_int == 200
-        assert r.body == b_('UPDATED')
+        assert r.body == b'UPDATED'
 
         # make sure it works
         r = app.get('/things/4')
         assert r.status_int == 200
-        assert r.body == b_('FOUR!')
+        assert r.body == b'FOUR!'
 
         # test get delete
         r = app.get('/things/4/delete')
         assert r.status_int == 200
-        assert r.body == b_('DELETE FOUR!')
+        assert r.body == b'DELETE FOUR!'
 
         # test delete
         r = app.delete('/things/4')
         assert r.status_int == 200
-        assert r.body == b_('DELETED')
+        assert r.body == b'DELETED'
 
         # make sure it works
         r = app.get('/things')
@@ -186,32 +187,32 @@ class TestRestController(PecanTestCase):
         # test delete with _method parameter and POST
         r = app.post('/things/3?_method=DELETE')
         assert r.status_int == 200
-        assert r.body == b_('DELETED')
+        assert r.body == b'DELETED'
 
         # make sure it works
         r = app.get('/things')
         assert r.status_int == 200
         assert len(loads(r.body.decode())['items']) == 3
 
-        # test "RESET" custom action
-        r = app.request('/things', method='RESET')
+        # test "TRACE" custom action
+        r = app.request('/things', method='TRACE')
         assert r.status_int == 200
-        assert r.body == b_('RESET')
+        assert r.body == b'TRACE'
 
-        # test "RESET" custom action with _method parameter
-        r = app.get('/things?_method=RESET')
+        # test "TRACE" custom action with _method parameter
+        r = app.get('/things?_method=TRACE')
         assert r.status_int == 200
-        assert r.body == b_('RESET')
+        assert r.body == b'TRACE'
 
         # test the "OPTIONS" custom action
         r = app.request('/things', method='OPTIONS')
         assert r.status_int == 200
-        assert r.body == b_('OPTIONS')
+        assert r.body == b'OPTIONS'
 
         # test the "OPTIONS" custom action with the _method parameter
         r = app.post('/things', {'_method': 'OPTIONS'})
         assert r.status_int == 200
-        assert r.body == b_('OPTIONS')
+        assert r.body == b'OPTIONS'
 
         # test the "other" custom action
         with warnings.catch_warnings():
@@ -228,7 +229,7 @@ class TestRestController(PecanTestCase):
             warnings.simplefilter("ignore")
             r = app.request('/things/others/', method='MISC')
             assert r.status_int == 200
-            assert r.body == b_('OTHERS')
+            assert r.body == b'OTHERS'
 
         # test the "others" custom action missing trailing slash
         with warnings.catch_warnings():
@@ -239,7 +240,7 @@ class TestRestController(PecanTestCase):
         # test the "others" custom action with the _method parameter
         r = app.get('/things/others/?_method=MISC')
         assert r.status_int == 200
-        assert r.body == b_('OTHERS')
+        assert r.body == b'OTHERS'
 
         # test an invalid custom action
         r = app.get('/things?_method=BAD', status=405)
@@ -248,27 +249,27 @@ class TestRestController(PecanTestCase):
         # test custom "GET" request "count"
         r = app.get('/things/count')
         assert r.status_int == 200
-        assert r.body == b_('3')
+        assert r.body == b'3'
 
         # test custom "GET" request "length"
         r = app.get('/things/1/length')
         assert r.status_int == 200
-        assert r.body == b_(str(len('one')))
+        assert r.body == b'3'
 
         # test custom "GET" request through subcontroller
         r = app.get('/things/others/echo?value=test')
         assert r.status_int == 200
-        assert r.body == b_('test')
+        assert r.body == b'test'
 
         # test custom "POST" request "length"
         r = app.post('/things/1/length', {'value': 'test'})
         assert r.status_int == 200
-        assert r.body == b_(str(len('onetest')))
+        assert r.body == b'7'
 
         # test custom "POST" request through subcontroller
         r = app.post('/things/others/echo', {'value': 'test'})
         assert r.status_int == 200
-        assert r.body == b_('test')
+        assert r.body == b'test'
 
     def test_getall_with_trailing_slash(self):
 
@@ -289,7 +290,9 @@ class TestRestController(PecanTestCase):
         # test get_all
         r = app.get('/things/')
         assert r.status_int == 200
-        assert r.body == b_(dumps(dict(items=ThingsController.data)))
+        assert r.body == dumps(
+            dict(items=ThingsController.data)
+        ).encode('utf-8')
 
     def test_405_with_lookup(self):
 
@@ -321,7 +324,7 @@ class TestRestController(PecanTestCase):
 
         r = app.get('/things/foo')
         assert r.status_int == 200
-        assert r.body == b_('ID: foo')
+        assert r.body == b'ID: foo'
 
     def test_getall_with_lookup(self):
 
@@ -356,11 +359,13 @@ class TestRestController(PecanTestCase):
         for path in ('/things', '/things/'):
             r = app.get(path)
             assert r.status_int == 200
-            assert r.body == b_(dumps(dict(items=ThingsController.data)))
+            assert r.body == dumps(
+                dict(items=ThingsController.data)
+            ).encode('utf-8')
 
         r = app.get('/things/foo')
         assert r.status_int == 200
-        assert r.body == b_('ID: foo')
+        assert r.body == b'ID: foo'
 
     def test_simple_nested_rest(self):
 
@@ -394,19 +399,19 @@ class TestRestController(PecanTestCase):
 
         r = app.post('/foo')
         assert r.status_int == 200
-        assert r.body == b_("FOO-POST")
+        assert r.body == b"FOO-POST"
 
         r = app.delete('/foo/1')
         assert r.status_int == 200
-        assert r.body == b_("FOO-1")
+        assert r.body == b"FOO-1"
 
         r = app.post('/foo/bar')
         assert r.status_int == 200
-        assert r.body == b_("BAR-POST")
+        assert r.body == b"BAR-POST"
 
         r = app.delete('/foo/bar/2')
         assert r.status_int == 200
-        assert r.body == b_("BAR-2")
+        assert r.body == b"BAR-2"
 
     def test_complicated_nested_rest(self):
 
@@ -504,75 +509,79 @@ class TestRestController(PecanTestCase):
         # test get_all
         r = app.get('/foos')
         assert r.status_int == 200
-        assert r.body == b_(dumps(dict(items=FoosController.data)))
+        assert r.body == dumps(
+            dict(items=FoosController.data)
+        ).encode('utf-8')
 
         # test nested get_all
         r = app.get('/foos/1/bars')
         assert r.status_int == 200
-        assert r.body == b_(dumps(dict(items=BarsController.data[1])))
+        assert r.body == dumps(
+            dict(items=BarsController.data[1])
+        ).encode('utf-8')
 
         # test get_one
         for i, value in enumerate(FoosController.data):
             r = app.get('/foos/%d' % i)
             assert r.status_int == 200
-            assert r.body == b_(value)
+            assert r.body == value.encode('utf-8')
 
         # test nested get_one
         for i, value in enumerate(FoosController.data):
             for j, value in enumerate(BarsController.data[i]):
                 r = app.get('/foos/%s/bars/%s' % (i, j))
                 assert r.status_int == 200
-                assert r.body == b_(value)
+                assert r.body == value.encode('utf-8')
 
         # test post
         r = app.post('/foos', {'value': 'two'})
         assert r.status_int == 302
-        assert r.body == b_('CREATED')
+        assert r.body == b'CREATED'
 
         # make sure it works
         r = app.get('/foos/2')
         assert r.status_int == 200
-        assert r.body == b_('two')
+        assert r.body == b'two'
 
         # test nested post
         r = app.post('/foos/2/bars', {'value': 'two-zero'})
         assert r.status_int == 302
-        assert r.body == b_('CREATED FOR 2')
+        assert r.body == b'CREATED FOR 2'
 
         # make sure it works
         r = app.get('/foos/2/bars/0')
         assert r.status_int == 200
-        assert r.body == b_('two-zero')
+        assert r.body == b'two-zero'
 
         # test edit
         r = app.get('/foos/1/edit')
         assert r.status_int == 200
-        assert r.body == b_('EDIT one')
+        assert r.body == b'EDIT one'
 
         # test nested edit
         r = app.get('/foos/1/bars/1/edit')
         assert r.status_int == 200
-        assert r.body == b_('EDIT one-one')
+        assert r.body == b'EDIT one-one'
 
         # test put
         r = app.put('/foos/2', {'value': 'TWO'})
         assert r.status_int == 200
-        assert r.body == b_('UPDATED')
+        assert r.body == b'UPDATED'
 
         # make sure it works
         r = app.get('/foos/2')
         assert r.status_int == 200
-        assert r.body == b_('TWO')
+        assert r.body == b'TWO'
 
         # test nested put
         r = app.put('/foos/2/bars/0', {'value': 'TWO-ZERO'})
         assert r.status_int == 200
-        assert r.body == b_('UPDATED')
+        assert r.body == b'UPDATED'
 
         # make sure it works
         r = app.get('/foos/2/bars/0')
         assert r.status_int == 200
-        assert r.body == b_('TWO-ZERO')
+        assert r.body == b'TWO-ZERO'
 
         # test put with _method parameter and GET
         r = app.get('/foos/2?_method=put', {'value': 'TWO!'}, status=405)
@@ -581,7 +590,7 @@ class TestRestController(PecanTestCase):
         # make sure it works
         r = app.get('/foos/2')
         assert r.status_int == 200
-        assert r.body == b_('TWO')
+        assert r.body == b'TWO'
 
         # test nested put with _method parameter and GET
         r = app.get(
@@ -593,42 +602,42 @@ class TestRestController(PecanTestCase):
         # make sure it works
         r = app.get('/foos/2/bars/0')
         assert r.status_int == 200
-        assert r.body == b_('TWO-ZERO')
+        assert r.body == b'TWO-ZERO'
 
         # test put with _method parameter and POST
         r = app.post('/foos/2?_method=put', {'value': 'TWO!'})
         assert r.status_int == 200
-        assert r.body == b_('UPDATED')
+        assert r.body == b'UPDATED'
 
         # make sure it works
         r = app.get('/foos/2')
         assert r.status_int == 200
-        assert r.body == b_('TWO!')
+        assert r.body == b'TWO!'
 
         # test nested put with _method parameter and POST
         r = app.post('/foos/2/bars/0?_method=put', {'value': 'TWO-ZERO!'})
         assert r.status_int == 200
-        assert r.body == b_('UPDATED')
+        assert r.body == b'UPDATED'
 
         # make sure it works
         r = app.get('/foos/2/bars/0')
         assert r.status_int == 200
-        assert r.body == b_('TWO-ZERO!')
+        assert r.body == b'TWO-ZERO!'
 
         # test get delete
         r = app.get('/foos/2/delete')
         assert r.status_int == 200
-        assert r.body == b_('DELETE TWO!')
+        assert r.body == b'DELETE TWO!'
 
         # test nested get delete
         r = app.get('/foos/2/bars/0/delete')
         assert r.status_int == 200
-        assert r.body == b_('DELETE TWO-ZERO!')
+        assert r.body == b'DELETE TWO-ZERO!'
 
         # test nested delete
         r = app.delete('/foos/2/bars/0')
         assert r.status_int == 200
-        assert r.body == b_('DELETED')
+        assert r.body == b'DELETED'
 
         # make sure it works
         r = app.get('/foos/2/bars')
@@ -638,7 +647,7 @@ class TestRestController(PecanTestCase):
         # test delete
         r = app.delete('/foos/2')
         assert r.status_int == 200
-        assert r.body == b_('DELETED')
+        assert r.body == b'DELETED'
 
         # make sure it works
         r = app.get('/foos')
@@ -666,7 +675,7 @@ class TestRestController(PecanTestCase):
         # test nested delete with _method parameter and POST
         r = app.post('/foos/1/bars/1?_method=DELETE')
         assert r.status_int == 200
-        assert r.body == b_('DELETED')
+        assert r.body == b'DELETED'
 
         # make sure it works
         r = app.get('/foos/1/bars')
@@ -676,7 +685,7 @@ class TestRestController(PecanTestCase):
         # test delete with _method parameter and POST
         r = app.post('/foos/1?_method=DELETE')
         assert r.status_int == 200
-        assert r.body == b_('DELETED')
+        assert r.body == b'DELETED'
 
         # make sure it works
         r = app.get('/foos')
@@ -715,19 +724,19 @@ class TestRestController(PecanTestCase):
 
         r = app.get('/foos/')
         assert r.status_int == 200
-        assert r.body == b_('1')
+        assert r.body == b'1'
 
         r = app.get('/foos/1/')
         assert r.status_int == 200
-        assert r.body == b_('2')
+        assert r.body == b'2'
 
         r = app.get('/foos/1/bars/')
         assert r.status_int == 200
-        assert r.body == b_('3')
+        assert r.body == b'3'
 
         r = app.get('/foos/1/bars/2/')
         assert r.status_int == 200
-        assert r.body == b_('4')
+        assert r.body == b'4'
 
         r = app.get('/foos/bars/', status=404)
         assert r.status_int == 404
@@ -771,19 +780,19 @@ class TestRestController(PecanTestCase):
 
         r = app.get('/foos/')
         assert r.status_int == 200
-        assert r.body == b_('1')
+        assert r.body == b'1'
 
         r = app.get('/foos/1/')
         assert r.status_int == 200
-        assert r.body == b_('2')
+        assert r.body == b'2'
 
         r = app.get('/foos/1/bars/')
         assert r.status_int == 200
-        assert r.body == b_('3')
+        assert r.body == b'3'
 
         r = app.get('/foos/1/bars/2/')
         assert r.status_int == 200
-        assert r.body == b_('4')
+        assert r.body == b'4'
 
         r = app.get('/foos/bars/')
         assert r.status_int == 302
@@ -847,10 +856,10 @@ class TestRestController(PecanTestCase):
         r = app.post('/things/1?_method=DELETE', status=405)
         assert r.status_int == 405
 
-        # test "RESET" custom action
+        # test "TRACE" custom action
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            r = app.request('/things', method='RESET', status=405)
+            r = app.request('/things', method='TRACE', status=405)
             assert r.status_int == 405
 
     def test_nested_rest_with_missing_intermediate_id(self):
@@ -886,12 +895,16 @@ class TestRestController(PecanTestCase):
         # test get_all
         r = app.get('/foos')
         self.assertEqual(r.status_int, 200)
-        self.assertEqual(r.body, b_(dumps(dict(items=FoosController.data))))
+        self.assertEqual(r.body, dumps(
+            dict(items=FoosController.data)
+        ).encode('utf-8'))
 
         # test nested get_all
         r = app.get('/foos/1/bars')
         self.assertEqual(r.status_int, 200)
-        self.assertEqual(r.body, b_(dumps(dict(items=BarsController.data[1]))))
+        self.assertEqual(r.body, dumps(
+            dict(items=BarsController.data[1])
+        ).encode('utf-8'))
 
         r = app.get('/foos/bars', expect_errors=True)
         self.assertEqual(r.status_int, 404)
@@ -927,35 +940,35 @@ class TestRestController(PecanTestCase):
 
         r = app.get('/detail')
         assert r.status_int == 200
-        assert r.body == b_('DETAIL')
+        assert r.body == b'DETAIL'
 
         r = app.get('/detail/')
         assert r.status_int == 200
-        assert r.body == b_('DETAIL')
+        assert r.body == b'DETAIL'
 
         r = app.post('/create')
         assert r.status_int == 200
-        assert r.body == b_('CREATE')
+        assert r.body == b'CREATE'
 
         r = app.post('/create/')
         assert r.status_int == 200
-        assert r.body == b_('CREATE')
+        assert r.body == b'CREATE'
 
         r = app.put('/update/123')
         assert r.status_int == 200
-        assert r.body == b_('123')
+        assert r.body == b'123'
 
         r = app.put('/update/123/')
         assert r.status_int == 200
-        assert r.body == b_('123')
+        assert r.body == b'123'
 
         r = app.delete('/remove/456')
         assert r.status_int == 200
-        assert r.body == b_('456')
+        assert r.body == b'456'
 
         r = app.delete('/remove/456/')
         assert r.status_int == 200
-        assert r.body == b_('456')
+        assert r.body == b'456'
 
     def test_custom_delete(self):
 
@@ -998,7 +1011,7 @@ class TestRestController(PecanTestCase):
         # test custom delete without ID
         r = app.delete('/things/others/')
         assert r.status_int == 200
-        assert r.body == b_('DELETE')
+        assert r.body == b'DELETE'
 
         # test custom delete without ID with _method parameter and GET
         r = app.get('/things/others/?_method=delete', status=405)
@@ -1007,12 +1020,12 @@ class TestRestController(PecanTestCase):
         # test custom delete without ID with _method parameter and POST
         r = app.post('/things/others/', {'_method': 'delete'})
         assert r.status_int == 200
-        assert r.body == b_('DELETE')
+        assert r.body == b'DELETE'
 
         # test custom delete with ID
         r = app.delete('/things/others/reset/1')
         assert r.status_int == 200
-        assert r.body == b_('1')
+        assert r.body == b'1'
 
         # test custom delete with ID with _method parameter and GET
         r = app.get('/things/others/reset/1?_method=delete', status=405)
@@ -1021,7 +1034,7 @@ class TestRestController(PecanTestCase):
         # test custom delete with ID with _method parameter and POST
         r = app.post('/things/others/reset/1', {'_method': 'delete'})
         assert r.status_int == 200
-        assert r.body == b_('1')
+        assert r.body == b'1'
 
     def test_get_with_var_args(self):
 
@@ -1048,12 +1061,12 @@ class TestRestController(PecanTestCase):
         # test get request
         r = app.get('/things/one/two/three')
         assert r.status_int == 200
-        assert r.body == b_('one, two, three')
+        assert r.body == b'one, two, three'
 
         # test nested get request
         r = app.get('/things/one/two/three/others/')
         assert r.status_int == 200
-        assert r.body == b_('NESTED: one, two, three')
+        assert r.body == b'NESTED: one, two, three'
 
     def test_sub_nested_rest(self):
 
@@ -1094,7 +1107,7 @@ class TestRestController(PecanTestCase):
         # test sub-nested get_one
         r = app.get('/foos/0/bars/0/bazs/0')
         assert r.status_int == 200
-        assert r.body == b_('zero-zero-zero')
+        assert r.body == b'zero-zero-zero'
 
     def test_sub_nested_rest_with_overwrites(self):
 
@@ -1170,35 +1183,35 @@ class TestRestController(PecanTestCase):
 
         r = app.post('/foos')
         assert r.status_int == 200
-        assert r.body == b_('POST')
+        assert r.body == b'POST'
 
         r = app.put('/foos/0')
         assert r.status_int == 200
-        assert r.body == b_('PUT')
+        assert r.body == b'PUT'
 
         r = app.post('/foos/bars')
         assert r.status_int == 200
-        assert r.body == b_('POST-CHILD')
+        assert r.body == b'POST-CHILD'
 
         r = app.put('/foos/bars/0')
         assert r.status_int == 200
-        assert r.body == b_('PUT-CHILD')
+        assert r.body == b'PUT-CHILD'
 
         r = app.post('/foos/bars/bazs')
         assert r.status_int == 200
-        assert r.body == b_('POST-GRAND-CHILD')
+        assert r.body == b'POST-GRAND-CHILD'
 
         r = app.put('/foos/bars/bazs/0')
         assert r.status_int == 200
-        assert r.body == b_('PUT-GRAND-CHILD')
+        assert r.body == b'PUT-GRAND-CHILD'
 
         r = app.get('/foos/bars/bazs/final/')
         assert r.status_int == 200
-        assert r.body == b_('FINAL')
+        assert r.body == b'FINAL'
 
         r = app.get('/foos/bars/bazs/final/named')
         assert r.status_int == 200
-        assert r.body == b_('NAMED')
+        assert r.body == b'NAMED'
 
     def test_post_with_kwargs_only(self):
 
@@ -1217,7 +1230,7 @@ class TestRestController(PecanTestCase):
 
         r = app.get('/')
         assert r.status_int == 200
-        assert r.body == b_('INDEX')
+        assert r.body == b'INDEX'
 
         kwargs = {'foo': 'bar', 'spam': 'eggs'}
         r = app.post('/', kwargs)
@@ -1306,43 +1319,43 @@ class TestRestController(PecanTestCase):
 
         r = app.get('/foo')
         assert r.status_int == 200
-        assert r.body == b_('INDEX')
+        assert r.body == b'INDEX'
 
         r = app.post('/foo')
         assert r.status_int == 200
-        assert r.body == b_('POST')
+        assert r.body == b'POST'
 
         r = app.get('/foo/1')
         assert r.status_int == 200
-        assert r.body == b_('GET ONE')
+        assert r.body == b'GET ONE'
 
         r = app.post('/foo/1')
         assert r.status_int == 200
-        assert r.body == b_('POST-LOOKUP-1')
+        assert r.body == b'POST-LOOKUP-1'
 
         r = app.put('/foo/1')
         assert r.status_int == 200
-        assert r.body == b_('PUT-1')
+        assert r.body == b'PUT-1'
 
         r = app.delete('/foo/1')
         assert r.status_int == 200
-        assert r.body == b_('DELETE-1')
+        assert r.body == b'DELETE-1'
 
         r = app.put('/foo/1/2')
         assert r.status_int == 200
-        assert r.body == b_('PUT-LOOKUP-1-2')
+        assert r.body == b'PUT-LOOKUP-1-2'
 
         r = app.delete('/foo/1/2')
         assert r.status_int == 200
-        assert r.body == b_('DELETE-LOOKUP-1-2')
+        assert r.body == b'DELETE-LOOKUP-1-2'
 
         r = app.get('/foo/1/2')
         assert r.status_int == 200
-        assert r.body == b_('FINAL-2')
+        assert r.body == b'FINAL-2'
 
         r = app.post('/foo/1/2')
         assert r.status_int == 200
-        assert r.body == b_('POST-2')
+        assert r.body == b'POST-2'
 
     def test_nested_rest_with_default(self):
 
@@ -1359,28 +1372,7 @@ class TestRestController(PecanTestCase):
 
         r = app.get('/foo/missing')
         assert r.status_int == 200
-        assert r.body == b_("DEFAULT missing")
-
-    def test_rest_with_non_utf_8_body(self):
-        if PY3:
-            # webob+PY3 doesn't suffer from this bug; the POST parsing in PY3
-            # seems to more gracefully detect the bytestring
-            return
-
-        class FooController(RestController):
-
-            @expose()
-            def post(self):
-                return "POST"
-
-        class RootController(RestController):
-            foo = FooController()
-
-        app = TestApp(make_app(RootController()))
-
-        data = struct.pack('255h', *range(0, 255))
-        r = app.post('/foo/', data, expect_errors=True)
-        assert r.status_int == 400
+        assert r.body == b"DEFAULT missing"
 
     def test_dynamic_rest_lookup(self):
         class BarController(RestController):
@@ -1444,43 +1436,43 @@ class TestRestController(PecanTestCase):
 
         r = app.get('/foos')
         assert r.status_int == 200
-        assert r.body == b_('FOOS')
+        assert r.body == b'FOOS'
 
         r = app.post('/foos')
         assert r.status_int == 200
-        assert r.body == b_('POST_FOOS')
+        assert r.body == b'POST_FOOS'
 
         r = app.get('/foos/foo')
         assert r.status_int == 200
-        assert r.body == b_('FOO')
+        assert r.body == b'FOO'
 
         r = app.put('/foos/foo')
         assert r.status_int == 200
-        assert r.body == b_('PUT_FOO')
+        assert r.body == b'PUT_FOO'
 
         r = app.delete('/foos/foo')
         assert r.status_int == 200
-        assert r.body == b_('DELETE_FOO')
+        assert r.body == b'DELETE_FOO'
 
         r = app.get('/foos/foo/bars')
         assert r.status_int == 200
-        assert r.body == b_('BARS')
+        assert r.body == b'BARS'
 
         r = app.post('/foos/foo/bars')
         assert r.status_int == 200
-        assert r.body == b_('POST_BARS')
+        assert r.body == b'POST_BARS'
 
         r = app.get('/foos/foo/bars/bar')
         assert r.status_int == 200
-        assert r.body == b_('BAR')
+        assert r.body == b'BAR'
 
         r = app.put('/foos/foo/bars/bar')
         assert r.status_int == 200
-        assert r.body == b_('PUT_BAR')
+        assert r.body == b'PUT_BAR'
 
         r = app.delete('/foos/foo/bars/bar')
         assert r.status_int == 200
-        assert r.body == b_('DELETE_BAR')
+        assert r.body == b'DELETE_BAR'
 
     def test_method_not_allowed_get(self):
         class ThingsController(RestController):
@@ -1554,7 +1546,7 @@ class TestRestController(PecanTestCase):
     def test_rest_with_utf8_uri(self):
 
         class FooController(RestController):
-            key = chr(0x1F330) if PY3 else unichr(0x1F330)
+            key = chr(0x1F330)
             data = {key: 'Success!'}
 
             @expose()
@@ -1594,7 +1586,6 @@ class TestRestController(PecanTestCase):
         assert r.status_int == 200
         assert r.body == b'Hello, World!'
 
-    @unittest.skipIf(not PY3, "test is Python3 specific")
     def test_rest_with_utf8_endpoint(self):
         class ChildController(object):
             @expose()

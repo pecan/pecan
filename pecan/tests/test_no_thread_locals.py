@@ -4,8 +4,6 @@ import warnings
 from unittest import mock
 
 from webtest import TestApp
-from six import b as b_
-from six import u as u_
 import webob
 
 from pecan import Pecan, expose, abort, Request, Response
@@ -48,7 +46,7 @@ class TestThreadingLocalUsage(PecanTestCase):
             app = TestApp(Pecan(self.root(), use_context_locals=False))
             r = app.get('/')
             assert r.status_int == 200
-            assert r.body == b_('Hello, World!')
+            assert r.body == b'Hello, World!'
 
             self.assertRaises(AssertionError, Pecan, self.root)
 
@@ -99,17 +97,17 @@ class TestIndexRouting(PecanTestCase):
     def test_empty_root(self):
         r = self.app_.get('/')
         assert r.status_int == 200
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
     def test_index(self):
         r = self.app_.get('/index')
         assert r.status_int == 200
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
     def test_index_html(self):
         r = self.app_.get('/index.html')
         assert r.status_int == 200
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
 
 class TestManualResponse(PecanTestCase):
@@ -120,12 +118,12 @@ class TestManualResponse(PecanTestCase):
             @expose()
             def index(self, req, resp):
                 resp = webob.Response(resp.environ)
-                resp.body = b_('Hello, World!')
+                resp.body = b'Hello, World!'
                 return resp
 
         app = TestApp(Pecan(RootController(), use_context_locals=False))
         r = app.get('/')
-        assert r.body == b_('Hello, World!'), r.body
+        assert r.body == b'Hello, World!', r.body
 
 
 class TestDispatch(PecanTestCase):
@@ -180,22 +178,22 @@ class TestDispatch(PecanTestCase):
     def test_index(self):
         r = self.app_.get('/')
         assert r.status_int == 200
-        assert r.body == b_('/')
+        assert r.body == b'/'
 
     def test_one_level(self):
         r = self.app_.get('/deeper')
         assert r.status_int == 200
-        assert r.body == b_('/deeper')
+        assert r.body == b'/deeper'
 
     def test_one_level_with_trailing(self):
         r = self.app_.get('/sub/')
         assert r.status_int == 200
-        assert r.body == b_('/sub/')
+        assert r.body == b'/sub/'
 
     def test_two_levels(self):
         r = self.app_.get('/sub/deeper')
         assert r.status_int == 200
-        assert r.body == b_('/sub/deeper')
+        assert r.body == b'/sub/deeper'
 
     def test_two_levels_with_trailing(self):
         r = self.app_.get('/sub/sub/')
@@ -204,7 +202,7 @@ class TestDispatch(PecanTestCase):
     def test_three_levels(self):
         r = self.app_.get('/sub/sub/deeper')
         assert r.status_int == 200
-        assert r.body == b_('/sub/sub/deeper')
+        assert r.body == b'/sub/sub/deeper'
 
 
 class TestLookups(PecanTestCase):
@@ -237,17 +235,17 @@ class TestLookups(PecanTestCase):
     def test_index(self):
         r = self.app_.get('/')
         assert r.status_int == 200
-        assert r.body == b_('/')
+        assert r.body == b'/'
 
     def test_lookup(self):
         r = self.app_.get('/100/')
         assert r.status_int == 200
-        assert r.body == b_('/100')
+        assert r.body == b'/100'
 
     def test_lookup_with_method(self):
         r = self.app_.get('/100/name')
         assert r.status_int == 200
-        assert r.body == b_('/100/name')
+        assert r.body == b'/100/name'
 
     def test_lookup_with_wrong_argspec(self):
         class RootController(object):
@@ -288,7 +286,7 @@ class TestCanonicalLookups(PecanTestCase):
         assert self.app_.get('/users', expect_errors=404).status_int == 404
         assert self.app_.get('/users/', expect_errors=404).status_int == 404
         assert self.app_.get('/users/100').status_int == 302
-        assert self.app_.get('/users/100/').body == b_('100')
+        assert self.app_.get('/users/100/').body == b'100'
 
 
 class TestControllerArguments(PecanTestCase):
@@ -372,12 +370,12 @@ class TestControllerArguments(PecanTestCase):
     def test_single_argument(self):
         r = self.app_.get('/1')
         assert r.status_int == 200
-        assert r.body == b_('index: 1')
+        assert r.body == b'index: 1'
 
     def test_single_argument_with_encoded_url(self):
         r = self.app_.get('/This%20is%20a%20test%21')
         assert r.status_int == 200
-        assert r.body == b_('index: This is a test!')
+        assert r.body == b'index: This is a test!'
 
     def test_two_arguments(self):
         r = self.app_.get('/1/dummy', status=404)
@@ -386,90 +384,90 @@ class TestControllerArguments(PecanTestCase):
     def test_keyword_argument(self):
         r = self.app_.get('/?id=2')
         assert r.status_int == 200
-        assert r.body == b_('index: 2')
+        assert r.body == b'index: 2'
 
     def test_keyword_argument_with_encoded_url(self):
         r = self.app_.get('/?id=This%20is%20a%20test%21')
         assert r.status_int == 200
-        assert r.body == b_('index: This is a test!')
+        assert r.body == b'index: This is a test!'
 
     def test_argument_and_keyword_argument(self):
         r = self.app_.get('/3?id=three')
         assert r.status_int == 200
-        assert r.body == b_('index: 3')
+        assert r.body == b'index: 3'
 
     def test_encoded_argument_and_keyword_argument(self):
         r = self.app_.get('/This%20is%20a%20test%21?id=three')
         assert r.status_int == 200
-        assert r.body == b_('index: This is a test!')
+        assert r.body == b'index: This is a test!'
 
     def test_explicit_kwargs(self):
         r = self.app_.post('/', {'id': '4'})
         assert r.status_int == 200
-        assert r.body == b_('index: 4')
+        assert r.body == b'index: 4'
 
     def test_path_with_explicit_kwargs(self):
         r = self.app_.post('/4', {'id': 'four'})
         assert r.status_int == 200
-        assert r.body == b_('index: 4')
+        assert r.body == b'index: 4'
 
     def test_multiple_kwargs(self):
         r = self.app_.get('/?id=5&dummy=dummy')
         assert r.status_int == 200
-        assert r.body == b_('index: 5')
+        assert r.body == b'index: 5'
 
     def test_kwargs_from_root(self):
         r = self.app_.post('/', {'id': '6', 'dummy': 'dummy'})
         assert r.status_int == 200
-        assert r.body == b_('index: 6')
+        assert r.body == b'index: 6'
 
         # multiple args
 
     def test_multiple_positional_arguments(self):
         r = self.app_.get('/multiple/one/two')
         assert r.status_int == 200
-        assert r.body == b_('multiple: one, two')
+        assert r.body == b'multiple: one, two'
 
     def test_multiple_positional_arguments_with_url_encode(self):
         r = self.app_.get('/multiple/One%20/Two%21')
         assert r.status_int == 200
-        assert r.body == b_('multiple: One , Two!')
+        assert r.body == b'multiple: One , Two!'
 
     def test_multiple_positional_arguments_with_kwargs(self):
         r = self.app_.get('/multiple?one=three&two=four')
         assert r.status_int == 200
-        assert r.body == b_('multiple: three, four')
+        assert r.body == b'multiple: three, four'
 
     def test_multiple_positional_arguments_with_url_encoded_kwargs(self):
         r = self.app_.get('/multiple?one=Three%20&two=Four%20%21')
         assert r.status_int == 200
-        assert r.body == b_('multiple: Three , Four !')
+        assert r.body == b'multiple: Three , Four !'
 
     def test_positional_args_with_dictionary_kwargs(self):
         r = self.app_.post('/multiple', {'one': 'five', 'two': 'six'})
         assert r.status_int == 200
-        assert r.body == b_('multiple: five, six')
+        assert r.body == b'multiple: five, six'
 
     def test_positional_args_with_url_encoded_dictionary_kwargs(self):
         r = self.app_.post('/multiple', {'one': 'Five%20', 'two': 'Six%20%21'})
         assert r.status_int == 200
-        assert r.body == b_('multiple: Five%20, Six%20%21')
+        assert r.body == b'multiple: Five%20, Six%20%21'
 
         # optional arg
     def test_optional_arg(self):
         r = self.app_.get('/optional')
         assert r.status_int == 200
-        assert r.body == b_('optional: None')
+        assert r.body == b'optional: None'
 
     def test_multiple_optional(self):
         r = self.app_.get('/optional/1')
         assert r.status_int == 200
-        assert r.body == b_('optional: 1')
+        assert r.body == b'optional: 1'
 
     def test_multiple_optional_url_encoded(self):
         r = self.app_.get('/optional/Some%20Number')
         assert r.status_int == 200
-        assert r.body == b_('optional: Some Number')
+        assert r.body == b'optional: Some Number'
 
     def test_multiple_optional_missing(self):
         r = self.app_.get('/optional/2/dummy', status=404)
@@ -478,57 +476,57 @@ class TestControllerArguments(PecanTestCase):
     def test_multiple_with_kwargs(self):
         r = self.app_.get('/optional?id=2')
         assert r.status_int == 200
-        assert r.body == b_('optional: 2')
+        assert r.body == b'optional: 2'
 
     def test_multiple_with_url_encoded_kwargs(self):
         r = self.app_.get('/optional?id=Some%20Number')
         assert r.status_int == 200
-        assert r.body == b_('optional: Some Number')
+        assert r.body == b'optional: Some Number'
 
     def test_multiple_args_with_url_encoded_kwargs(self):
         r = self.app_.get('/optional/3?id=three')
         assert r.status_int == 200
-        assert r.body == b_('optional: 3')
+        assert r.body == b'optional: 3'
 
     def test_url_encoded_positional_args(self):
         r = self.app_.get('/optional/Some%20Number?id=three')
         assert r.status_int == 200
-        assert r.body == b_('optional: Some Number')
+        assert r.body == b'optional: Some Number'
 
     def test_optional_arg_with_kwargs(self):
         r = self.app_.post('/optional', {'id': '4'})
         assert r.status_int == 200
-        assert r.body == b_('optional: 4')
+        assert r.body == b'optional: 4'
 
     def test_optional_arg_with_url_encoded_kwargs(self):
         r = self.app_.post('/optional', {'id': 'Some%20Number'})
         assert r.status_int == 200
-        assert r.body == b_('optional: Some%20Number')
+        assert r.body == b'optional: Some%20Number'
 
     def test_multiple_positional_arguments_with_dictionary_kwargs(self):
         r = self.app_.post('/optional/5', {'id': 'five'})
         assert r.status_int == 200
-        assert r.body == b_('optional: 5')
+        assert r.body == b'optional: 5'
 
     def test_multiple_positional_url_encoded_arguments_with_kwargs(self):
         r = self.app_.post('/optional/Some%20Number', {'id': 'five'})
         assert r.status_int == 200
-        assert r.body == b_('optional: Some Number')
+        assert r.body == b'optional: Some Number'
 
     def test_optional_arg_with_multiple_kwargs(self):
         r = self.app_.get('/optional?id=6&dummy=dummy')
         assert r.status_int == 200
-        assert r.body == b_('optional: 6')
+        assert r.body == b'optional: 6'
 
     def test_optional_arg_with_multiple_url_encoded_kwargs(self):
         r = self.app_.get('/optional?id=Some%20Number&dummy=dummy')
         assert r.status_int == 200
-        assert r.body == b_('optional: Some Number')
+        assert r.body == b'optional: Some Number'
 
     def test_optional_arg_with_multiple_dictionary_kwargs(self):
         r = self.app_.post('/optional', {'id': '7', 'dummy': 'dummy'})
         assert r.status_int == 200
-        assert r.body == b_('optional: 7')
+        assert r.body == b'optional: 7'
 
     def test_optional_arg_with_multiple_url_encoded_dictionary_kwargs(self):
         r = self.app_.post('/optional', {
@@ -536,34 +534,34 @@ class TestControllerArguments(PecanTestCase):
             'dummy': 'dummy'
         })
         assert r.status_int == 200
-        assert r.body == b_('optional: Some%20Number')
+        assert r.body == b'optional: Some%20Number'
 
         # multiple optional args
 
     def test_multiple_optional_positional_args(self):
         r = self.app_.get('/multiple_optional')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: None, None, None')
+        assert r.body == b'multiple_optional: None, None, None'
 
     def test_multiple_optional_positional_args_one_arg(self):
         r = self.app_.get('/multiple_optional/1')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, None, None')
+        assert r.body == b'multiple_optional: 1, None, None'
 
     def test_multiple_optional_positional_args_one_url_encoded_arg(self):
         r = self.app_.get('/multiple_optional/One%21')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One!, None, None')
+        assert r.body == b'multiple_optional: One!, None, None'
 
     def test_multiple_optional_positional_args_all_args(self):
         r = self.app_.get('/multiple_optional/1/2/3')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, 2, 3')
+        assert r.body == b'multiple_optional: 1, 2, 3'
 
     def test_multiple_optional_positional_args_all_url_encoded_args(self):
         r = self.app_.get('/multiple_optional/One%21/Two%21/Three%21')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One!, Two!, Three!')
+        assert r.body == b'multiple_optional: One!, Two!, Three!'
 
     def test_multiple_optional_positional_args_too_many_args(self):
         r = self.app_.get('/multiple_optional/1/2/3/dummy', status=404)
@@ -572,54 +570,54 @@ class TestControllerArguments(PecanTestCase):
     def test_multiple_optional_positional_args_with_kwargs(self):
         r = self.app_.get('/multiple_optional?one=1')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, None, None')
+        assert r.body == b'multiple_optional: 1, None, None'
 
     def test_multiple_optional_positional_args_with_url_encoded_kwargs(self):
         r = self.app_.get('/multiple_optional?one=One%21')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One!, None, None')
+        assert r.body == b'multiple_optional: One!, None, None'
 
     def test_multiple_optional_positional_args_with_string_kwargs(self):
         r = self.app_.get('/multiple_optional/1?one=one')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, None, None')
+        assert r.body == b'multiple_optional: 1, None, None'
 
     def test_multiple_optional_positional_args_with_encoded_str_kwargs(self):
         r = self.app_.get('/multiple_optional/One%21?one=one')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One!, None, None')
+        assert r.body == b'multiple_optional: One!, None, None'
 
     def test_multiple_optional_positional_args_with_dict_kwargs(self):
         r = self.app_.post('/multiple_optional', {'one': '1'})
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, None, None')
+        assert r.body == b'multiple_optional: 1, None, None'
 
     def test_multiple_optional_positional_args_with_encoded_dict_kwargs(self):
         r = self.app_.post('/multiple_optional', {'one': 'One%21'})
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One%21, None, None')
+        assert r.body == b'multiple_optional: One%21, None, None'
 
     def test_multiple_optional_positional_args_and_dict_kwargs(self):
         r = self.app_.post('/multiple_optional/1', {'one': 'one'})
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, None, None')
+        assert r.body == b'multiple_optional: 1, None, None'
 
     def test_multiple_optional_encoded_positional_args_and_dict_kwargs(self):
         r = self.app_.post('/multiple_optional/One%21', {'one': 'one'})
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One!, None, None')
+        assert r.body == b'multiple_optional: One!, None, None'
 
     def test_multiple_optional_args_with_multiple_kwargs(self):
         r = self.app_.get('/multiple_optional?one=1&two=2&three=3&four=4')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, 2, 3')
+        assert r.body == b'multiple_optional: 1, 2, 3'
 
     def test_multiple_optional_args_with_multiple_encoded_kwargs(self):
         r = self.app_.get(
             '/multiple_optional?one=One%21&two=Two%21&three=Three%21&four=4'
         )
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One!, Two!, Three!')
+        assert r.body == b'multiple_optional: One!, Two!, Three!'
 
     def test_multiple_optional_args_with_multiple_dict_kwargs(self):
         r = self.app_.post(
@@ -627,7 +625,7 @@ class TestControllerArguments(PecanTestCase):
             {'one': '1', 'two': '2', 'three': '3', 'four': '4'}
         )
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, 2, 3')
+        assert r.body == b'multiple_optional: 1, 2, 3'
 
     def test_multiple_optional_args_with_multiple_encoded_dict_kwargs(self):
         r = self.app_.post(
@@ -640,52 +638,52 @@ class TestControllerArguments(PecanTestCase):
             }
         )
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One%21, Two%21, Three%21')
+        assert r.body == b'multiple_optional: One%21, Two%21, Three%21'
 
     def test_multiple_optional_args_with_last_kwarg(self):
         r = self.app_.get('/multiple_optional?three=3')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: None, None, 3')
+        assert r.body == b'multiple_optional: None, None, 3'
 
     def test_multiple_optional_args_with_last_encoded_kwarg(self):
         r = self.app_.get('/multiple_optional?three=Three%21')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: None, None, Three!')
+        assert r.body == b'multiple_optional: None, None, Three!'
 
     def test_multiple_optional_args_with_middle_arg(self):
         r = self.app_.get('/multiple_optional', {'two': '2'})
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: None, 2, None')
+        assert r.body == b'multiple_optional: None, 2, None'
 
     def test_variable_args(self):
         r = self.app_.get('/variable_args')
         assert r.status_int == 200
-        assert r.body == b_('variable_args: ')
+        assert r.body == b'variable_args: '
 
     def test_multiple_variable_args(self):
         r = self.app_.get('/variable_args/1/dummy')
         assert r.status_int == 200
-        assert r.body == b_('variable_args: 1, dummy')
+        assert r.body == b'variable_args: 1, dummy'
 
     def test_multiple_encoded_variable_args(self):
         r = self.app_.get('/variable_args/Testing%20One%20Two/Three%21')
         assert r.status_int == 200
-        assert r.body == b_('variable_args: Testing One Two, Three!')
+        assert r.body == b'variable_args: Testing One Two, Three!'
 
     def test_variable_args_with_kwargs(self):
         r = self.app_.get('/variable_args?id=2&dummy=dummy')
         assert r.status_int == 200
-        assert r.body == b_('variable_args: ')
+        assert r.body == b'variable_args: '
 
     def test_variable_args_with_dict_kwargs(self):
         r = self.app_.post('/variable_args', {'id': '3', 'dummy': 'dummy'})
         assert r.status_int == 200
-        assert r.body == b_('variable_args: ')
+        assert r.body == b'variable_args: '
 
     def test_variable_kwargs(self):
         r = self.app_.get('/variable_kwargs')
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: ')
+        assert r.body == b'variable_kwargs: '
 
     def test_multiple_variable_kwargs(self):
         r = self.app_.get('/variable_kwargs/1/dummy', status=404)
@@ -694,19 +692,19 @@ class TestControllerArguments(PecanTestCase):
     def test_multiple_variable_kwargs_with_explicit_kwargs(self):
         r = self.app_.get('/variable_kwargs?id=2&dummy=dummy')
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: dummy=dummy, id=2')
+        assert r.body == b'variable_kwargs: dummy=dummy, id=2'
 
     def test_multiple_variable_kwargs_with_explicit_encoded_kwargs(self):
         r = self.app_.get(
             '/variable_kwargs?id=Two%21&dummy=This%20is%20a%20test'
         )
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: dummy=This is a test, id=Two!')
+        assert r.body == b'variable_kwargs: dummy=This is a test, id=Two!'
 
     def test_multiple_variable_kwargs_with_dict_kwargs(self):
         r = self.app_.post('/variable_kwargs', {'id': '3', 'dummy': 'dummy'})
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: dummy=dummy, id=3')
+        assert r.body == b'variable_kwargs: dummy=dummy, id=3'
 
     def test_multiple_variable_kwargs_with_encoded_dict_kwargs(self):
         r = self.app_.post(
@@ -714,43 +712,43 @@ class TestControllerArguments(PecanTestCase):
             {'id': 'Three%21', 'dummy': 'This%20is%20a%20test'}
         )
         assert r.status_int == 200
-        result = 'variable_kwargs: dummy=This%20is%20a%20test, id=Three%21'
-        assert r.body == b_(result)
+        result = b'variable_kwargs: dummy=This%20is%20a%20test, id=Three%21'
+        assert r.body == result
 
     def test_variable_all(self):
         r = self.app_.get('/variable_all')
         assert r.status_int == 200
-        assert r.body == b_('variable_all: ')
+        assert r.body == b'variable_all: '
 
     def test_variable_all_with_one_extra(self):
         r = self.app_.get('/variable_all/1')
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 1')
+        assert r.body == b'variable_all: 1'
 
     def test_variable_all_with_two_extras(self):
         r = self.app_.get('/variable_all/2/dummy')
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 2, dummy')
+        assert r.body == b'variable_all: 2, dummy'
 
     def test_variable_mixed(self):
         r = self.app_.get('/variable_all/3?month=1&day=12')
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 3, day=12, month=1')
+        assert r.body == b'variable_all: 3, day=12, month=1'
 
     def test_variable_mixed_explicit(self):
         r = self.app_.get('/variable_all/4?id=four&month=1&day=12')
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 4, day=12, id=four, month=1')
+        assert r.body == b'variable_all: 4, day=12, id=four, month=1'
 
     def test_variable_post(self):
         r = self.app_.post('/variable_all/5/dummy')
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 5, dummy')
+        assert r.body == b'variable_all: 5, dummy'
 
     def test_variable_post_with_kwargs(self):
         r = self.app_.post('/variable_all/6', {'month': '1', 'day': '12'})
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 6, day=12, month=1')
+        assert r.body == b'variable_all: 6, day=12, month=1'
 
     def test_variable_post_mixed(self):
         r = self.app_.post(
@@ -758,7 +756,7 @@ class TestControllerArguments(PecanTestCase):
             {'id': 'seven', 'month': '1', 'day': '12'}
         )
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 7, day=12, id=seven, month=1')
+        assert r.body == b'variable_all: 7, day=12, id=seven, month=1'
 
     def test_no_remainder(self):
         try:
@@ -778,47 +776,47 @@ class TestControllerArguments(PecanTestCase):
     def test_one_remainder(self):
         r = self.app_.get('/eater/1')
         assert r.status_int == 200
-        assert r.body == b_('eater: 1, None, ')
+        assert r.body == b'eater: 1, None, '
 
     def test_two_remainders(self):
         r = self.app_.get('/eater/2/dummy')
         assert r.status_int == 200
-        assert r.body == b_('eater: 2, dummy, ')
+        assert r.body == b'eater: 2, dummy, '
 
     def test_many_remainders(self):
         r = self.app_.get('/eater/3/dummy/foo/bar')
         assert r.status_int == 200
-        assert r.body == b_('eater: 3, dummy, foo, bar')
+        assert r.body == b'eater: 3, dummy, foo, bar'
 
     def test_remainder_with_kwargs(self):
         r = self.app_.get('/eater/4?month=1&day=12')
         assert r.status_int == 200
-        assert r.body == b_('eater: 4, None, day=12, month=1')
+        assert r.body == b'eater: 4, None, day=12, month=1'
 
     def test_remainder_with_many_kwargs(self):
         r = self.app_.get('/eater/5?id=five&month=1&day=12&dummy=dummy')
         assert r.status_int == 200
-        assert r.body == b_('eater: 5, dummy, day=12, month=1')
+        assert r.body == b'eater: 5, dummy, day=12, month=1'
 
     def test_post_remainder(self):
         r = self.app_.post('/eater/6')
         assert r.status_int == 200
-        assert r.body == b_('eater: 6, None, ')
+        assert r.body == b'eater: 6, None, '
 
     def test_post_three_remainders(self):
         r = self.app_.post('/eater/7/dummy')
         assert r.status_int == 200
-        assert r.body == b_('eater: 7, dummy, ')
+        assert r.body == b'eater: 7, dummy, '
 
     def test_post_many_remainders(self):
         r = self.app_.post('/eater/8/dummy/foo/bar')
         assert r.status_int == 200
-        assert r.body == b_('eater: 8, dummy, foo, bar')
+        assert r.body == b'eater: 8, dummy, foo, bar'
 
     def test_post_remainder_with_kwargs(self):
         r = self.app_.post('/eater/9', {'month': '1', 'day': '12'})
         assert r.status_int == 200
-        assert r.body == b_('eater: 9, None, day=12, month=1')
+        assert r.body == b'eater: 9, None, day=12, month=1'
 
     def test_post_many_remainders_with_many_kwargs(self):
         r = self.app_.post(
@@ -826,7 +824,7 @@ class TestControllerArguments(PecanTestCase):
             {'id': 'ten', 'month': '1', 'day': '12', 'dummy': 'dummy'}
         )
         assert r.status_int == 200
-        assert r.body == b_('eater: 10, dummy, day=12, month=1')
+        assert r.body == b'eater: 10, dummy, day=12, month=1'
 
 
 class TestRestController(PecanTestCase):
@@ -891,8 +889,8 @@ class TestRestController(PecanTestCase):
                 return 'DELETED'
 
             @expose()
-            def reset(self, req, resp):
-                return 'RESET'
+            def trace(self, req, resp):
+                return 'TRACE'
 
             @expose()
             def post_options(self, req, resp):
@@ -915,28 +913,30 @@ class TestRestController(PecanTestCase):
     def test_get_all(self):
         r = self.app_.get('/things')
         assert r.status_int == 200
-        assert r.body == b_(dumps(dict(items=['zero', 'one', 'two', 'three'])))
+        assert r.body == dumps(
+            dict(items=['zero', 'one', 'two', 'three'])
+        ).encode('utf-8')
 
     def test_get_one(self):
-        for i, value in enumerate(['zero', 'one', 'two', 'three']):
+        for i, value in enumerate([b'zero', b'one', b'two', b'three']):
             r = self.app_.get('/things/%d' % i)
             assert r.status_int == 200
-            assert r.body == b_(value)
+            assert r.body == value
 
     def test_post(self):
         r = self.app_.post('/things', {'value': 'four'})
         assert r.status_int == 302
-        assert r.body == b_('CREATED')
+        assert r.body == b'CREATED'
 
     def test_custom_action(self):
         r = self.app_.get('/things/3/edit')
         assert r.status_int == 200
-        assert r.body == b_('EDIT three')
+        assert r.body == b'EDIT three'
 
     def test_put(self):
         r = self.app_.put('/things/3', {'value': 'THREE!'})
         assert r.status_int == 200
-        assert r.body == b_('UPDATED')
+        assert r.body == b'UPDATED'
 
     def test_put_with_method_parameter_and_get(self):
         r = self.app_.get('/things/3?_method=put', {'value': 'X'}, status=405)
@@ -945,17 +945,17 @@ class TestRestController(PecanTestCase):
     def test_put_with_method_parameter_and_post(self):
         r = self.app_.post('/things/3?_method=put', {'value': 'THREE!'})
         assert r.status_int == 200
-        assert r.body == b_('UPDATED')
+        assert r.body == b'UPDATED'
 
     def test_get_delete(self):
         r = self.app_.get('/things/3/delete')
         assert r.status_int == 200
-        assert r.body == b_('DELETE three')
+        assert r.body == b'DELETE three'
 
     def test_delete_method(self):
         r = self.app_.delete('/things/3')
         assert r.status_int == 200
-        assert r.body == b_('DELETED')
+        assert r.body == b'DELETED'
 
     def test_delete_with_method_parameter(self):
         r = self.app_.get('/things/3?_method=DELETE', status=405)
@@ -964,27 +964,27 @@ class TestRestController(PecanTestCase):
     def test_delete_with_method_parameter_and_post(self):
         r = self.app_.post('/things/3?_method=DELETE')
         assert r.status_int == 200
-        assert r.body == b_('DELETED')
+        assert r.body == b'DELETED'
 
     def test_custom_method_type(self):
-        r = self.app_.request('/things', method='RESET')
+        r = self.app_.request('/things', method='TRACE')
         assert r.status_int == 200
-        assert r.body == b_('RESET')
+        assert r.body == b'TRACE'
 
     def test_custom_method_type_with_method_parameter(self):
-        r = self.app_.get('/things?_method=RESET')
+        r = self.app_.get('/things?_method=TRACE')
         assert r.status_int == 200
-        assert r.body == b_('RESET')
+        assert r.body == b'TRACE'
 
     def test_options(self):
         r = self.app_.request('/things', method='OPTIONS')
         assert r.status_int == 200
-        assert r.body == b_('OPTIONS')
+        assert r.body == b'OPTIONS'
 
     def test_options_with_method_parameter(self):
         r = self.app_.post('/things', {'_method': 'OPTIONS'})
         assert r.status_int == 200
-        assert r.body == b_('OPTIONS')
+        assert r.body == b'OPTIONS'
 
     def test_other_custom_action(self):
         with warnings.catch_warnings():
@@ -1001,7 +1001,7 @@ class TestRestController(PecanTestCase):
             warnings.simplefilter("ignore")
             r = self.app_.request('/things/others/', method='MISC')
             assert r.status_int == 200
-            assert r.body == b_('OTHERS')
+            assert r.body == b'OTHERS'
 
     def test_nested_controller_without_trailing_slash(self):
         with warnings.catch_warnings():
@@ -1017,19 +1017,19 @@ class TestRestController(PecanTestCase):
         # test custom "GET" request "length"
         r = self.app_.get('/things/1/length')
         assert r.status_int == 200
-        assert r.body == b_(str(len('one')))
+        assert r.body == b'3'
 
     def test_named_nested_action(self):
         # test custom "GET" request through subcontroller
         r = self.app_.get('/things/others/echo?value=test')
         assert r.status_int == 200
-        assert r.body == b_('test')
+        assert r.body == b'test'
 
     def test_nested_post(self):
         # test custom "POST" request through subcontroller
         r = self.app_.post('/things/others/echo', {'value': 'test'})
         assert r.status_int == 200
-        assert r.body == b_('test')
+        assert r.body == b'test'
 
 
 class TestHooks(PecanTestCase):
@@ -1063,7 +1063,7 @@ class TestHooks(PecanTestCase):
         ))
         response = app.get('/')
         assert response.status_int == 200
-        assert response.body == b_('Hello, World!')
+        assert response.body == b'Hello, World!'
 
         assert len(run_hook) == 4
         assert run_hook[0] == 'on_route'
@@ -1101,7 +1101,7 @@ class TestHooks(PecanTestCase):
         ], use_context_locals=False))
         response = app.get('/')
         assert response.status_int == 200
-        assert response.body == b_('Hello, World!')
+        assert response.body == b'Hello, World!'
 
         assert len(run_hook) == 10
         assert run_hook[0] == 'on_route1'
@@ -1142,7 +1142,7 @@ class TestHooks(PecanTestCase):
 
         response = app.get('/')
         assert response.status_int == 200
-        assert response.body == b_('Hello World!')
+        assert response.body == b'Hello World!'
 
         assert len(run_hook) == 2
         assert run_hook[0] == 'on_route'
@@ -1171,7 +1171,7 @@ class TestHooks(PecanTestCase):
                 run_hook.append('error')
 
                 r = webob.Response()
-                r.text = u_('on_error')
+                r.text = 'on_error'
 
                 return r
 
@@ -1218,7 +1218,7 @@ class TestHooks(PecanTestCase):
         app = TestApp(papp)
         response = app.get('/')
         assert response.status_int == 200
-        assert response.body == b_('Hello, World!')
+        assert response.body == b'Hello, World!'
 
         assert len(run_hook) == 10
         assert run_hook[0] == 'on_route3'
@@ -1275,7 +1275,7 @@ class TestHooks(PecanTestCase):
         app = TestApp(Pecan(RootController(), use_context_locals=False))
         response = app.get('/')
         assert response.status_int == 200
-        assert response.body == b_('Hello, World!')
+        assert response.body == b'Hello, World!'
 
         assert len(run_hook) == 1
         assert run_hook[0] == 'inside'
@@ -1284,7 +1284,7 @@ class TestHooks(PecanTestCase):
 
         response = app.get('/sub/')
         assert response.status_int == 200
-        assert response.body == b_('Inside here!')
+        assert response.body == b'Inside here!'
 
         assert len(run_hook) == 3
         assert run_hook[0] == 'before'
@@ -1294,7 +1294,7 @@ class TestHooks(PecanTestCase):
         run_hook = []
         response = app.get('/sub/sub/')
         assert response.status_int == 200
-        assert response.body == b_('Deep inside here!')
+        assert response.body == b'Deep inside here!'
 
         assert len(run_hook) == 3
         assert run_hook[0] == 'before'
@@ -1343,7 +1343,7 @@ class TestHooks(PecanTestCase):
         ))
         response = app.get('/')
         assert response.status_int == 200
-        assert response.body == b_('Hello, World!')
+        assert response.body == b'Hello, World!'
 
         assert len(run_hook) == 4
         assert run_hook[0] == 'on_route1'
@@ -1355,7 +1355,7 @@ class TestHooks(PecanTestCase):
 
         response = app.get('/sub/')
         assert response.status_int == 200
-        assert response.body == b_('Inside here!')
+        assert response.body == b'Inside here!'
 
         assert len(run_hook) == 6
         assert run_hook[0] == 'on_route1'

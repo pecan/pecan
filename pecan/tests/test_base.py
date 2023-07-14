@@ -5,15 +5,11 @@ import os
 import json
 import traceback
 import warnings
-from unittest import mock
+from io import StringIO, BytesIO
 
 import webob
 from webob.exc import HTTPNotFound
 from webtest import TestApp
-import six
-from six import b as b_
-from six import u as u_
-from six.moves import cStringIO as StringIO
 
 from pecan import (
     Pecan, Request, Response, expose, request, response, redirect,
@@ -36,7 +32,7 @@ class TestAppRoot(PecanTestCase):
 
     def test_controller_lookup_by_string_path(self):
         app = Pecan('pecan.tests.test_base.SampleRootController')
-        assert app.root and isinstance(app.root, SampleRootController)
+        assert app.root and app.root.__class__.__name__ == 'SampleRootController'
 
 
 class TestEmptyContent(PecanTestCase):
@@ -49,19 +45,19 @@ class TestEmptyContent(PecanTestCase):
 
             @expose()
             def explicit_body(self):
-                response.body = b_('Hello, World!')
+                response.body = b'Hello, World!'
 
             @expose()
             def empty_body(self):
-                response.body = b_('')
+                response.body = b''
 
             @expose()
             def explicit_text(self):
-                response.text = six.text_type('Hello, World!')
+                response.text = 'Hello, World!'
 
             @expose()
             def empty_text(self):
-                response.text = six.text_type('')
+                response.text = ''
 
             @expose()
             def explicit_json(self):
@@ -91,22 +87,22 @@ class TestEmptyContent(PecanTestCase):
     def test_explicit_body(self):
         r = self.app_.get('/explicit_body/')
         self.assertEqual(r.status_int, 200)
-        self.assertEqual(r.body, b_('Hello, World!'))
+        self.assertEqual(r.body, b'Hello, World!')
 
     def test_empty_body(self):
         r = self.app_.get('/empty_body/')
         self.assertEqual(r.status_int, 204)
-        self.assertEqual(r.body, b_(''))
+        self.assertEqual(r.body, b'')
 
     def test_explicit_text(self):
         r = self.app_.get('/explicit_text/')
         self.assertEqual(r.status_int, 200)
-        self.assertEqual(r.body, b_('Hello, World!'))
+        self.assertEqual(r.body, b'Hello, World!')
 
     def test_empty_text(self):
         r = self.app_.get('/empty_text/')
         self.assertEqual(r.status_int, 204)
-        self.assertEqual(r.body, b_(''))
+        self.assertEqual(r.body, b'')
 
     def test_explicit_json(self):
         r = self.app_.get('/explicit_json/')
@@ -127,12 +123,12 @@ class TestAppIterFile(PecanTestCase):
         class RootController(object):
             @expose()
             def index(self):
-                body = six.BytesIO(b_('Hello, World!'))
+                body = BytesIO(b'Hello, World!')
                 response.body_file = body
 
             @expose()
             def empty(self):
-                body = six.BytesIO(b_(''))
+                body = BytesIO(b'')
                 response.body_file = body
 
         return TestApp(Pecan(RootController()))
@@ -140,7 +136,7 @@ class TestAppIterFile(PecanTestCase):
     def test_body_generator(self):
         r = self.app_.get('/')
         self.assertEqual(r.status_int, 200)
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
     def test_empty_body_generator(self):
         r = self.app_.get('/empty')
@@ -179,17 +175,17 @@ class TestIndexRouting(PecanTestCase):
     def test_empty_root(self):
         r = self.app_.get('/')
         assert r.status_int == 200
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
     def test_index(self):
         r = self.app_.get('/index')
         assert r.status_int == 200
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
     def test_index_html(self):
         r = self.app_.get('/index.html')
         assert r.status_int == 200
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
 
 class TestObjectDispatch(PecanTestCase):
@@ -232,22 +228,22 @@ class TestObjectDispatch(PecanTestCase):
     def test_index(self):
         r = self.app_.get('/')
         assert r.status_int == 200
-        assert r.body == b_('/')
+        assert r.body == b'/'
 
     def test_one_level(self):
         r = self.app_.get('/deeper')
         assert r.status_int == 200
-        assert r.body == b_('/deeper')
+        assert r.body == b'/deeper'
 
     def test_one_level_with_trailing(self):
         r = self.app_.get('/sub/')
         assert r.status_int == 200
-        assert r.body == b_('/sub/')
+        assert r.body == b'/sub/'
 
     def test_two_levels(self):
         r = self.app_.get('/sub/deeper')
         assert r.status_int == 200
-        assert r.body == b_('/sub/deeper')
+        assert r.body == b'/sub/deeper'
 
     def test_two_levels_with_trailing(self):
         r = self.app_.get('/sub/sub/')
@@ -256,10 +252,9 @@ class TestObjectDispatch(PecanTestCase):
     def test_three_levels(self):
         r = self.app_.get('/sub/sub/deeper')
         assert r.status_int == 200
-        assert r.body == b_('/sub/sub/deeper')
+        assert r.body == b'/sub/sub/deeper'
 
 
-@unittest.skipIf(not six.PY3, "tests are Python3 specific")
 class TestUnicodePathSegments(PecanTestCase):
 
     def test_unicode_methods(self):
@@ -270,7 +265,7 @@ class TestUnicodePathSegments(PecanTestCase):
 
         resp = app.get('/%F0%9F%8C%B0/')
         assert resp.status_int == 200
-        assert resp.body == b_('Hello, World!')
+        assert resp.body == b'Hello, World!'
 
     def test_unicode_child(self):
         class ChildController(object):
@@ -285,7 +280,7 @@ class TestUnicodePathSegments(PecanTestCase):
 
         resp = app.get('/%F0%9F%8C%B0/')
         assert resp.status_int == 200
-        assert resp.body == b_('Hello, World!')
+        assert resp.body == b'Hello, World!'
 
 
 class TestLookups(PecanTestCase):
@@ -318,17 +313,17 @@ class TestLookups(PecanTestCase):
     def test_index(self):
         r = self.app_.get('/')
         assert r.status_int == 200
-        assert r.body == b_('/')
+        assert r.body == b'/'
 
     def test_lookup(self):
         r = self.app_.get('/100/')
         assert r.status_int == 200
-        assert r.body == b_('/100')
+        assert r.body == b'/100'
 
     def test_lookup_with_method(self):
         r = self.app_.get('/100/name')
         assert r.status_int == 200
-        assert r.body == b_('/100/name')
+        assert r.body == b'/100/name'
 
     def test_lookup_with_wrong_argspec(self):
         class RootController(object):
@@ -378,7 +373,7 @@ class TestCanonicalLookups(PecanTestCase):
         assert self.app_.get('/users', expect_errors=404).status_int == 404
         assert self.app_.get('/users/', expect_errors=404).status_int == 404
         assert self.app_.get('/users/100').status_int == 302
-        assert self.app_.get('/users/100/').body == b_('100')
+        assert self.app_.get('/users/100/').body == b'100'
 
 
 class TestControllerArguments(PecanTestCase):
@@ -466,22 +461,22 @@ class TestControllerArguments(PecanTestCase):
     def test_single_argument(self):
         r = self.app_.get('/1')
         assert r.status_int == 200
-        assert r.body == b_('index: 1')
+        assert r.body == b'index: 1'
 
     def test_single_argument_with_encoded_url(self):
         r = self.app_.get('/This%20is%20a%20test%21')
         assert r.status_int == 200
-        assert r.body == b_('index: This is a test!')
+        assert r.body == b'index: This is a test!'
 
     def test_single_argument_with_plus(self):
         r = self.app_.get('/foo+bar')
         assert r.status_int == 200
-        assert r.body == b_('index: foo+bar')
+        assert r.body == b'index: foo+bar'
 
     def test_single_argument_with_encoded_plus(self):
         r = self.app_.get('/foo%2Bbar')
         assert r.status_int == 200
-        assert r.body == b_('index: foo+bar')
+        assert r.body == b'index: foo+bar'
 
     def test_two_arguments(self):
         r = self.app_.get('/1/dummy', status=404)
@@ -490,120 +485,120 @@ class TestControllerArguments(PecanTestCase):
     def test_keyword_argument(self):
         r = self.app_.get('/?id=2')
         assert r.status_int == 200
-        assert r.body == b_('index: 2')
+        assert r.body == b'index: 2'
 
     def test_keyword_argument_with_encoded_url(self):
         r = self.app_.get('/?id=This%20is%20a%20test%21')
         assert r.status_int == 200
-        assert r.body == b_('index: This is a test!')
+        assert r.body == b'index: This is a test!'
 
     def test_keyword_argument_with_plus(self):
         r = self.app_.get('/?id=foo+bar')
         assert r.status_int == 200
-        assert r.body == b_('index: foo bar')
+        assert r.body == b'index: foo bar'
 
     def test_keyword_argument_with_encoded_plus(self):
         r = self.app_.get('/?id=foo%2Bbar')
         assert r.status_int == 200
-        assert r.body == b_('index: foo+bar')
+        assert r.body == b'index: foo+bar'
 
     def test_argument_and_keyword_argument(self):
         r = self.app_.get('/3?id=three')
         assert r.status_int == 200
-        assert r.body == b_('index: 3')
+        assert r.body == b'index: 3'
 
     def test_encoded_argument_and_keyword_argument(self):
         r = self.app_.get('/This%20is%20a%20test%21?id=three')
         assert r.status_int == 200
-        assert r.body == b_('index: This is a test!')
+        assert r.body == b'index: This is a test!'
 
     def test_explicit_kwargs(self):
         r = self.app_.post('/', {'id': '4'})
         assert r.status_int == 200
-        assert r.body == b_('index: 4')
+        assert r.body == b'index: 4'
 
     def test_path_with_explicit_kwargs(self):
         r = self.app_.post('/4', {'id': 'four'})
         assert r.status_int == 200
-        assert r.body == b_('index: 4')
+        assert r.body == b'index: 4'
 
     def test_explicit_json_kwargs(self):
         r = self.app_.post_json('/', {'id': '4'})
         assert r.status_int == 200
-        assert r.body == b_('index: 4')
+        assert r.body == b'index: 4'
 
     def test_path_with_explicit_json_kwargs(self):
         r = self.app_.post_json('/4', {'id': 'four'})
         assert r.status_int == 200
-        assert r.body == b_('index: 4')
+        assert r.body == b'index: 4'
 
     def test_multiple_kwargs(self):
         r = self.app_.get('/?id=5&dummy=dummy')
         assert r.status_int == 200
-        assert r.body == b_('index: 5')
+        assert r.body == b'index: 5'
 
     def test_kwargs_from_root(self):
         r = self.app_.post('/', {'id': '6', 'dummy': 'dummy'})
         assert r.status_int == 200
-        assert r.body == b_('index: 6')
+        assert r.body == b'index: 6'
 
     def test_json_kwargs_from_root(self):
         r = self.app_.post_json('/', {'id': '6', 'dummy': 'dummy'})
         assert r.status_int == 200
-        assert r.body == b_('index: 6')
+        assert r.body == b'index: 6'
 
         # multiple args
 
     def test_multiple_positional_arguments(self):
         r = self.app_.get('/multiple/one/two')
         assert r.status_int == 200
-        assert r.body == b_('multiple: one, two')
+        assert r.body == b'multiple: one, two'
 
     def test_multiple_positional_arguments_with_url_encode(self):
         r = self.app_.get('/multiple/One%20/Two%21')
         assert r.status_int == 200
-        assert r.body == b_('multiple: One , Two!')
+        assert r.body == b'multiple: One , Two!'
 
     def test_multiple_positional_arguments_with_kwargs(self):
         r = self.app_.get('/multiple?one=three&two=four')
         assert r.status_int == 200
-        assert r.body == b_('multiple: three, four')
+        assert r.body == b'multiple: three, four'
 
     def test_multiple_positional_arguments_with_url_encoded_kwargs(self):
         r = self.app_.get('/multiple?one=Three%20&two=Four%20%21')
         assert r.status_int == 200
-        assert r.body == b_('multiple: Three , Four !')
+        assert r.body == b'multiple: Three , Four !'
 
     def test_positional_args_with_dictionary_kwargs(self):
         r = self.app_.post('/multiple', {'one': 'five', 'two': 'six'})
         assert r.status_int == 200
-        assert r.body == b_('multiple: five, six')
+        assert r.body == b'multiple: five, six'
 
     def test_positional_args_with_json_kwargs(self):
         r = self.app_.post_json('/multiple', {'one': 'five', 'two': 'six'})
         assert r.status_int == 200
-        assert r.body == b_('multiple: five, six')
+        assert r.body == b'multiple: five, six'
 
     def test_positional_args_with_url_encoded_dictionary_kwargs(self):
         r = self.app_.post('/multiple', {'one': 'Five%20', 'two': 'Six%20%21'})
         assert r.status_int == 200
-        assert r.body == b_('multiple: Five%20, Six%20%21')
+        assert r.body == b'multiple: Five%20, Six%20%21'
 
         # optional arg
     def test_optional_arg(self):
         r = self.app_.get('/optional')
         assert r.status_int == 200
-        assert r.body == b_('optional: None')
+        assert r.body == b'optional: None'
 
     def test_multiple_optional(self):
         r = self.app_.get('/optional/1')
         assert r.status_int == 200
-        assert r.body == b_('optional: 1')
+        assert r.body == b'optional: 1'
 
     def test_multiple_optional_url_encoded(self):
         r = self.app_.get('/optional/Some%20Number')
         assert r.status_int == 200
-        assert r.body == b_('optional: Some Number')
+        assert r.body == b'optional: Some Number'
 
     def test_multiple_optional_missing(self):
         r = self.app_.get('/optional/2/dummy', status=404)
@@ -612,72 +607,72 @@ class TestControllerArguments(PecanTestCase):
     def test_multiple_with_kwargs(self):
         r = self.app_.get('/optional?id=2')
         assert r.status_int == 200
-        assert r.body == b_('optional: 2')
+        assert r.body == b'optional: 2'
 
     def test_multiple_with_url_encoded_kwargs(self):
         r = self.app_.get('/optional?id=Some%20Number')
         assert r.status_int == 200
-        assert r.body == b_('optional: Some Number')
+        assert r.body == b'optional: Some Number'
 
     def test_multiple_args_with_url_encoded_kwargs(self):
         r = self.app_.get('/optional/3?id=three')
         assert r.status_int == 200
-        assert r.body == b_('optional: 3')
+        assert r.body == b'optional: 3'
 
     def test_url_encoded_positional_args(self):
         r = self.app_.get('/optional/Some%20Number?id=three')
         assert r.status_int == 200
-        assert r.body == b_('optional: Some Number')
+        assert r.body == b'optional: Some Number'
 
     def test_optional_arg_with_kwargs(self):
         r = self.app_.post('/optional', {'id': '4'})
         assert r.status_int == 200
-        assert r.body == b_('optional: 4')
+        assert r.body == b'optional: 4'
 
     def test_optional_arg_with_json_kwargs(self):
         r = self.app_.post_json('/optional', {'id': '4'})
         assert r.status_int == 200
-        assert r.body == b_('optional: 4')
+        assert r.body == b'optional: 4'
 
     def test_optional_arg_with_url_encoded_kwargs(self):
         r = self.app_.post('/optional', {'id': 'Some%20Number'})
         assert r.status_int == 200
-        assert r.body == b_('optional: Some%20Number')
+        assert r.body == b'optional: Some%20Number'
 
     def test_multiple_positional_arguments_with_dictionary_kwargs(self):
         r = self.app_.post('/optional/5', {'id': 'five'})
         assert r.status_int == 200
-        assert r.body == b_('optional: 5')
+        assert r.body == b'optional: 5'
 
     def test_multiple_positional_arguments_with_json_kwargs(self):
         r = self.app_.post_json('/optional/5', {'id': 'five'})
         assert r.status_int == 200
-        assert r.body == b_('optional: 5')
+        assert r.body == b'optional: 5'
 
     def test_multiple_positional_url_encoded_arguments_with_kwargs(self):
         r = self.app_.post('/optional/Some%20Number', {'id': 'five'})
         assert r.status_int == 200
-        assert r.body == b_('optional: Some Number')
+        assert r.body == b'optional: Some Number'
 
     def test_optional_arg_with_multiple_kwargs(self):
         r = self.app_.get('/optional?id=6&dummy=dummy')
         assert r.status_int == 200
-        assert r.body == b_('optional: 6')
+        assert r.body == b'optional: 6'
 
     def test_optional_arg_with_multiple_url_encoded_kwargs(self):
         r = self.app_.get('/optional?id=Some%20Number&dummy=dummy')
         assert r.status_int == 200
-        assert r.body == b_('optional: Some Number')
+        assert r.body == b'optional: Some Number'
 
     def test_optional_arg_with_multiple_dictionary_kwargs(self):
         r = self.app_.post('/optional', {'id': '7', 'dummy': 'dummy'})
         assert r.status_int == 200
-        assert r.body == b_('optional: 7')
+        assert r.body == b'optional: 7'
 
     def test_optional_arg_with_multiple_json_kwargs(self):
         r = self.app_.post_json('/optional', {'id': '7', 'dummy': 'dummy'})
         assert r.status_int == 200
-        assert r.body == b_('optional: 7')
+        assert r.body == b'optional: 7'
 
     def test_optional_arg_with_multiple_url_encoded_dictionary_kwargs(self):
         r = self.app_.post('/optional', {
@@ -685,34 +680,34 @@ class TestControllerArguments(PecanTestCase):
             'dummy': 'dummy'
         })
         assert r.status_int == 200
-        assert r.body == b_('optional: Some%20Number')
+        assert r.body == b'optional: Some%20Number'
 
         # multiple optional args
 
     def test_multiple_optional_positional_args(self):
         r = self.app_.get('/multiple_optional')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: None, None, None')
+        assert r.body == b'multiple_optional: None, None, None'
 
     def test_multiple_optional_positional_args_one_arg(self):
         r = self.app_.get('/multiple_optional/1')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, None, None')
+        assert r.body == b'multiple_optional: 1, None, None'
 
     def test_multiple_optional_positional_args_one_url_encoded_arg(self):
         r = self.app_.get('/multiple_optional/One%21')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One!, None, None')
+        assert r.body == b'multiple_optional: One!, None, None'
 
     def test_multiple_optional_positional_args_all_args(self):
         r = self.app_.get('/multiple_optional/1/2/3')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, 2, 3')
+        assert r.body == b'multiple_optional: 1, 2, 3'
 
     def test_multiple_optional_positional_args_all_url_encoded_args(self):
         r = self.app_.get('/multiple_optional/One%21/Two%21/Three%21')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One!, Two!, Three!')
+        assert r.body == b'multiple_optional: One!, Two!, Three!'
 
     def test_multiple_optional_positional_args_too_many_args(self):
         r = self.app_.get('/multiple_optional/1/2/3/dummy', status=404)
@@ -721,64 +716,64 @@ class TestControllerArguments(PecanTestCase):
     def test_multiple_optional_positional_args_with_kwargs(self):
         r = self.app_.get('/multiple_optional?one=1')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, None, None')
+        assert r.body == b'multiple_optional: 1, None, None'
 
     def test_multiple_optional_positional_args_with_url_encoded_kwargs(self):
         r = self.app_.get('/multiple_optional?one=One%21')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One!, None, None')
+        assert r.body == b'multiple_optional: One!, None, None'
 
     def test_multiple_optional_positional_args_with_string_kwargs(self):
         r = self.app_.get('/multiple_optional/1?one=one')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, None, None')
+        assert r.body == b'multiple_optional: 1, None, None'
 
     def test_multiple_optional_positional_args_with_encoded_str_kwargs(self):
         r = self.app_.get('/multiple_optional/One%21?one=one')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One!, None, None')
+        assert r.body == b'multiple_optional: One!, None, None'
 
     def test_multiple_optional_positional_args_with_dict_kwargs(self):
         r = self.app_.post('/multiple_optional', {'one': '1'})
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, None, None')
+        assert r.body == b'multiple_optional: 1, None, None'
 
     def test_multiple_optional_positional_args_with_json_kwargs(self):
         r = self.app_.post_json('/multiple_optional', {'one': '1'})
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, None, None')
+        assert r.body == b'multiple_optional: 1, None, None'
 
     def test_multiple_optional_positional_args_with_encoded_dict_kwargs(self):
         r = self.app_.post('/multiple_optional', {'one': 'One%21'})
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One%21, None, None')
+        assert r.body == b'multiple_optional: One%21, None, None'
 
     def test_multiple_optional_positional_args_and_dict_kwargs(self):
         r = self.app_.post('/multiple_optional/1', {'one': 'one'})
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, None, None')
+        assert r.body == b'multiple_optional: 1, None, None'
 
     def test_multiple_optional_positional_args_and_json_kwargs(self):
         r = self.app_.post_json('/multiple_optional/1', {'one': 'one'})
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, None, None')
+        assert r.body == b'multiple_optional: 1, None, None'
 
     def test_multiple_optional_encoded_positional_args_and_dict_kwargs(self):
         r = self.app_.post('/multiple_optional/One%21', {'one': 'one'})
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One!, None, None')
+        assert r.body == b'multiple_optional: One!, None, None'
 
     def test_multiple_optional_args_with_multiple_kwargs(self):
         r = self.app_.get('/multiple_optional?one=1&two=2&three=3&four=4')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, 2, 3')
+        assert r.body == b'multiple_optional: 1, 2, 3'
 
     def test_multiple_optional_args_with_multiple_encoded_kwargs(self):
         r = self.app_.get(
             '/multiple_optional?one=One%21&two=Two%21&three=Three%21&four=4'
         )
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One!, Two!, Three!')
+        assert r.body == b'multiple_optional: One!, Two!, Three!'
 
     def test_multiple_optional_args_with_multiple_dict_kwargs(self):
         r = self.app_.post(
@@ -786,7 +781,7 @@ class TestControllerArguments(PecanTestCase):
             {'one': '1', 'two': '2', 'three': '3', 'four': '4'}
         )
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, 2, 3')
+        assert r.body == b'multiple_optional: 1, 2, 3'
 
     def test_multiple_optional_args_with_multiple_json_kwargs(self):
         r = self.app_.post_json(
@@ -794,7 +789,7 @@ class TestControllerArguments(PecanTestCase):
             {'one': '1', 'two': '2', 'three': '3', 'four': '4'}
         )
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: 1, 2, 3')
+        assert r.body == b'multiple_optional: 1, 2, 3'
 
     def test_multiple_optional_args_with_multiple_encoded_dict_kwargs(self):
         r = self.app_.post(
@@ -807,47 +802,47 @@ class TestControllerArguments(PecanTestCase):
             }
         )
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: One%21, Two%21, Three%21')
+        assert r.body == b'multiple_optional: One%21, Two%21, Three%21'
 
     def test_multiple_optional_args_with_last_kwarg(self):
         r = self.app_.get('/multiple_optional?three=3')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: None, None, 3')
+        assert r.body == b'multiple_optional: None, None, 3'
 
     def test_multiple_optional_args_with_last_encoded_kwarg(self):
         r = self.app_.get('/multiple_optional?three=Three%21')
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: None, None, Three!')
+        assert r.body == b'multiple_optional: None, None, Three!'
 
     def test_multiple_optional_args_with_middle_arg(self):
         r = self.app_.get('/multiple_optional', {'two': '2'})
         assert r.status_int == 200
-        assert r.body == b_('multiple_optional: None, 2, None')
+        assert r.body == b'multiple_optional: None, 2, None'
 
     def test_variable_args(self):
         r = self.app_.get('/variable_args')
         assert r.status_int == 200
-        assert r.body == b_('variable_args: ')
+        assert r.body == b'variable_args: '
 
     def test_multiple_variable_args(self):
         r = self.app_.get('/variable_args/1/dummy')
         assert r.status_int == 200
-        assert r.body == b_('variable_args: 1, dummy')
+        assert r.body == b'variable_args: 1, dummy'
 
     def test_multiple_encoded_variable_args(self):
         r = self.app_.get('/variable_args/Testing%20One%20Two/Three%21')
         assert r.status_int == 200
-        assert r.body == b_('variable_args: Testing One Two, Three!')
+        assert r.body == b'variable_args: Testing One Two, Three!'
 
     def test_variable_args_with_kwargs(self):
         r = self.app_.get('/variable_args?id=2&dummy=dummy')
         assert r.status_int == 200
-        assert r.body == b_('variable_args: ')
+        assert r.body == b'variable_args: '
 
     def test_variable_args_with_dict_kwargs(self):
         r = self.app_.post('/variable_args', {'id': '3', 'dummy': 'dummy'})
         assert r.status_int == 200
-        assert r.body == b_('variable_args: ')
+        assert r.body == b'variable_args: '
 
     def test_variable_args_with_json_kwargs(self):
         r = self.app_.post_json(
@@ -855,12 +850,12 @@ class TestControllerArguments(PecanTestCase):
             {'id': '3', 'dummy': 'dummy'}
         )
         assert r.status_int == 200
-        assert r.body == b_('variable_args: ')
+        assert r.body == b'variable_args: '
 
     def test_variable_kwargs(self):
         r = self.app_.get('/variable_kwargs')
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: ')
+        assert r.body == b'variable_kwargs: '
 
     def test_multiple_variable_kwargs(self):
         r = self.app_.get('/variable_kwargs/1/dummy', status=404)
@@ -869,19 +864,19 @@ class TestControllerArguments(PecanTestCase):
     def test_multiple_variable_kwargs_with_explicit_kwargs(self):
         r = self.app_.get('/variable_kwargs?id=2&dummy=dummy')
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: dummy=dummy, id=2')
+        assert r.body == b'variable_kwargs: dummy=dummy, id=2'
 
     def test_multiple_variable_kwargs_with_explicit_encoded_kwargs(self):
         r = self.app_.get(
             '/variable_kwargs?id=Two%21&dummy=This%20is%20a%20test'
         )
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: dummy=This is a test, id=Two!')
+        assert r.body == b'variable_kwargs: dummy=This is a test, id=Two!'
 
     def test_multiple_variable_kwargs_with_dict_kwargs(self):
         r = self.app_.post('/variable_kwargs', {'id': '3', 'dummy': 'dummy'})
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: dummy=dummy, id=3')
+        assert r.body == b'variable_kwargs: dummy=dummy, id=3'
 
     def test_multiple_variable_kwargs_with_json_kwargs(self):
         r = self.app_.post_json(
@@ -889,7 +884,7 @@ class TestControllerArguments(PecanTestCase):
             {'id': '3', 'dummy': 'dummy'}
         )
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: dummy=dummy, id=3')
+        assert r.body == b'variable_kwargs: dummy=dummy, id=3'
 
     def test_multiple_variable_kwargs_with_encoded_dict_kwargs(self):
         r = self.app_.post(
@@ -897,43 +892,43 @@ class TestControllerArguments(PecanTestCase):
             {'id': 'Three%21', 'dummy': 'This%20is%20a%20test'}
         )
         assert r.status_int == 200
-        result = 'variable_kwargs: dummy=This%20is%20a%20test, id=Three%21'
-        assert r.body == b_(result)
+        result = b'variable_kwargs: dummy=This%20is%20a%20test, id=Three%21'
+        assert r.body == result
 
     def test_variable_all(self):
         r = self.app_.get('/variable_all')
         assert r.status_int == 200
-        assert r.body == b_('variable_all: ')
+        assert r.body == b'variable_all: '
 
     def test_variable_all_with_one_extra(self):
         r = self.app_.get('/variable_all/1')
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 1')
+        assert r.body == b'variable_all: 1'
 
     def test_variable_all_with_two_extras(self):
         r = self.app_.get('/variable_all/2/dummy')
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 2, dummy')
+        assert r.body == b'variable_all: 2, dummy'
 
     def test_variable_mixed(self):
         r = self.app_.get('/variable_all/3?month=1&day=12')
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 3, day=12, month=1')
+        assert r.body == b'variable_all: 3, day=12, month=1'
 
     def test_variable_mixed_explicit(self):
         r = self.app_.get('/variable_all/4?id=four&month=1&day=12')
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 4, day=12, id=four, month=1')
+        assert r.body == b'variable_all: 4, day=12, id=four, month=1'
 
     def test_variable_post(self):
         r = self.app_.post('/variable_all/5/dummy')
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 5, dummy')
+        assert r.body == b'variable_all: 5, dummy'
 
     def test_variable_post_with_kwargs(self):
         r = self.app_.post('/variable_all/6', {'month': '1', 'day': '12'})
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 6, day=12, month=1')
+        assert r.body == b'variable_all: 6, day=12, month=1'
 
     def test_variable_post_with_json_kwargs(self):
         r = self.app_.post_json(
@@ -941,7 +936,7 @@ class TestControllerArguments(PecanTestCase):
             {'month': '1', 'day': '12'}
         )
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 6, day=12, month=1')
+        assert r.body == b'variable_all: 6, day=12, month=1'
 
     def test_variable_post_mixed(self):
         r = self.app_.post(
@@ -949,7 +944,7 @@ class TestControllerArguments(PecanTestCase):
             {'id': 'seven', 'month': '1', 'day': '12'}
         )
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 7, day=12, id=seven, month=1')
+        assert r.body == b'variable_all: 7, day=12, id=seven, month=1'
 
     def test_variable_post_mixed_with_json(self):
         r = self.app_.post_json(
@@ -957,39 +952,35 @@ class TestControllerArguments(PecanTestCase):
             {'id': 'seven', 'month': '1', 'day': '12'}
         )
         assert r.status_int == 200
-        assert r.body == b_('variable_all: 7, day=12, id=seven, month=1')
+        assert r.body == b'variable_all: 7, day=12, id=seven, month=1'
 
     def test_duplicate_query_parameters_GET(self):
         r = self.app_.get('/variable_kwargs?list=1&list=2')
-        l = [u_('1'), u_('2')]
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: list=%s' % l)
+        assert r.body == b"variable_kwargs: list=['1', '2']"
 
     def test_duplicate_query_parameters_POST(self):
         r = self.app_.post('/variable_kwargs',
                            {'list': ['1', '2']})
-        l = [u_('1'), u_('2')]
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: list=%s' % l)
+        assert r.body == b"variable_kwargs: list=['1', '2']"
 
     def test_duplicate_query_parameters_POST_mixed(self):
         r = self.app_.post('/variable_kwargs?list=1&list=2',
                            {'list': ['3', '4']})
-        l = [u_('1'), u_('2'), u_('3'), u_('4')]
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: list=%s' % l)
+        assert r.body == b"variable_kwargs: list=['1', '2', '3', '4']"
 
     def test_duplicate_query_parameters_POST_mixed_json(self):
         r = self.app_.post('/variable_kwargs?list=1&list=2',
                            {'list': 3})
-        l = [u_('1'), u_('2'), u_('3')]
         assert r.status_int == 200
-        assert r.body == b_('variable_kwargs: list=%s' % l)
+        assert r.body == b"variable_kwargs: list=['1', '2', '3']"
 
     def test_staticmethod(self):
         r = self.app_.get('/static/foobar')
         assert r.status_int == 200
-        assert r.body == b_('id is foobar')
+        assert r.body == b'id is foobar'
 
     def test_no_remainder(self):
         try:
@@ -1009,57 +1000,57 @@ class TestControllerArguments(PecanTestCase):
     def test_one_remainder(self):
         r = self.app_.get('/eater/1')
         assert r.status_int == 200
-        assert r.body == b_('eater: 1, None, ')
+        assert r.body == b'eater: 1, None, '
 
     def test_two_remainders(self):
         r = self.app_.get('/eater/2/dummy')
         assert r.status_int == 200
-        assert r.body == b_('eater: 2, dummy, ')
+        assert r.body == b'eater: 2, dummy, '
 
     def test_many_remainders(self):
         r = self.app_.get('/eater/3/dummy/foo/bar')
         assert r.status_int == 200
-        assert r.body == b_('eater: 3, dummy, foo, bar')
+        assert r.body == b'eater: 3, dummy, foo, bar'
 
     def test_remainder_with_kwargs(self):
         r = self.app_.get('/eater/4?month=1&day=12')
         assert r.status_int == 200
-        assert r.body == b_('eater: 4, None, day=12, month=1')
+        assert r.body == b'eater: 4, None, day=12, month=1'
 
     def test_remainder_with_many_kwargs(self):
         r = self.app_.get('/eater/5?id=five&month=1&day=12&dummy=dummy')
         assert r.status_int == 200
-        assert r.body == b_('eater: 5, dummy, day=12, month=1')
+        assert r.body == b'eater: 5, dummy, day=12, month=1'
 
     def test_post_remainder(self):
         r = self.app_.post('/eater/6')
         assert r.status_int == 200
-        assert r.body == b_('eater: 6, None, ')
+        assert r.body == b'eater: 6, None, '
 
     def test_post_three_remainders(self):
         r = self.app_.post('/eater/7/dummy')
         assert r.status_int == 200
-        assert r.body == b_('eater: 7, dummy, ')
+        assert r.body == b'eater: 7, dummy, '
 
     def test_post_many_remainders(self):
         r = self.app_.post('/eater/8/dummy/foo/bar')
         assert r.status_int == 200
-        assert r.body == b_('eater: 8, dummy, foo, bar')
+        assert r.body == b'eater: 8, dummy, foo, bar'
 
     def test_post_remainder_with_kwargs(self):
         r = self.app_.post('/eater/9', {'month': '1', 'day': '12'})
         assert r.status_int == 200
-        assert r.body == b_('eater: 9, None, day=12, month=1')
+        assert r.body == b'eater: 9, None, day=12, month=1'
 
     def test_post_empty_remainder_with_json_kwargs(self):
         r = self.app_.post_json('/eater/9/', {'month': '1', 'day': '12'})
         assert r.status_int == 200
-        assert r.body == b_('eater: 9, None, day=12, month=1')
+        assert r.body == b'eater: 9, None, day=12, month=1'
 
     def test_post_remainder_with_json_kwargs(self):
         r = self.app_.post_json('/eater/9', {'month': '1', 'day': '12'})
         assert r.status_int == 200
-        assert r.body == b_('eater: 9, None, day=12, month=1')
+        assert r.body == b'eater: 9, None, day=12, month=1'
 
     def test_post_many_remainders_with_many_kwargs(self):
         r = self.app_.post(
@@ -1067,7 +1058,7 @@ class TestControllerArguments(PecanTestCase):
             {'id': 'ten', 'month': '1', 'day': '12', 'dummy': 'dummy'}
         )
         assert r.status_int == 200
-        assert r.body == b_('eater: 10, dummy, day=12, month=1')
+        assert r.body == b'eater: 10, dummy, day=12, month=1'
 
     def test_post_many_remainders_with_many_json_kwargs(self):
         r = self.app_.post_json(
@@ -1075,7 +1066,7 @@ class TestControllerArguments(PecanTestCase):
             {'id': 'ten', 'month': '1', 'day': '12', 'dummy': 'dummy'}
         )
         assert r.status_int == 200
-        assert r.body == b_('eater: 10, dummy, day=12, month=1')
+        assert r.body == b'eater: 10, dummy, day=12, month=1'
 
 
 class TestDefaultErrorRendering(PecanTestCase):
@@ -1088,7 +1079,7 @@ class TestDefaultErrorRendering(PecanTestCase):
         r = app.get('/', status=404)
         assert r.status_int == 404
         assert r.content_type == 'text/plain'
-        assert r.body == b_(HTTPNotFound().plain_body({}))
+        assert r.body == HTTPNotFound().plain_body({}).encode('utf-8')
 
     def test_html_error(self):
         class RootController(object):
@@ -1098,7 +1089,7 @@ class TestDefaultErrorRendering(PecanTestCase):
         r = app.get('/', headers={'Accept': 'text/html'}, status=404)
         assert r.status_int == 404
         assert r.content_type == 'text/html'
-        assert r.body == b_(HTTPNotFound().html_body({}))
+        assert r.body == HTTPNotFound().html_body({}).encode('utf-8')
 
     def test_json_error(self):
         class RootController(object):
@@ -1200,12 +1191,12 @@ class TestRedirect(PecanTestCase):
         assert r.status_int == 302
         r = r.follow()
         assert r.status_int == 200
-        assert r.body == b_('it worked!')
+        assert r.body == b'it worked!'
 
     def test_internal(self):
         r = self.app_.get('/internal')
         assert r.status_int == 200
-        assert r.body == b_('it worked!')
+        assert r.body == b'it worked!'
 
     def test_internal_with_301(self):
         self.assertRaises(ValueError, self.app_.get, '/bad_internal')
@@ -1215,7 +1206,7 @@ class TestRedirect(PecanTestCase):
         assert r.status_int == 301
         r = r.follow()
         assert r.status_int == 200
-        assert r.body == b_('it worked!')
+        assert r.body == b'it worked!'
 
     def test_x_forward_proto(self):
         class ChildController(object):
@@ -1286,7 +1277,7 @@ class TestStreamedResponse(PecanTestCase):
             def test(self, foo):
                 if foo == 'stream':
                     # mimic large file
-                    contents = six.BytesIO(b_('stream'))
+                    contents = BytesIO(b'stream')
                     response.content_type = 'application/octet-stream'
                     contents.seek(0, os.SEEK_END)
                     response.content_length = contents.tell()
@@ -1299,11 +1290,11 @@ class TestStreamedResponse(PecanTestCase):
         app = TestApp(Pecan(RootController()))
         r = app.get('/test/stream')
         assert r.content_type == 'application/octet-stream'
-        assert r.body == b_('stream')
+        assert r.body == b'stream'
 
         r = app.get('/test/plain')
         assert r.content_type == 'text/plain'
-        assert r.body == b_('plain text')
+        assert r.body == b'plain text'
 
 
 class TestManualResponse(PecanTestCase):
@@ -1314,12 +1305,12 @@ class TestManualResponse(PecanTestCase):
             @expose()
             def index(self):
                 resp = webob.Response(response.environ)
-                resp.body = b_('Hello, World!')
+                resp.body = b'Hello, World!'
                 return resp
 
         app = TestApp(Pecan(RootController()))
         r = app.get('/')
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
 
 class TestCustomResponseandRequest(PecanTestCase):
@@ -1353,7 +1344,7 @@ class TestCustomResponseandRequest(PecanTestCase):
             response_cls=CustomResponse
         ))
         r = app.get('/')
-        assert r.body == b_('ABC')
+        assert r.body == b'ABC'
         assert r.headers.get('X-Custom-Response') == 'XYZ'
 
 
@@ -1374,7 +1365,7 @@ class TestThreadLocalState(PecanTestCase):
         app = TestApp(Pecan(RootController()))
         r = app.get('/')
         assert r.status_int == 200
-        assert r.body == b_('/')
+        assert r.body == b'/'
 
     def test_request_state_cleanup(self):
         """
@@ -1391,7 +1382,7 @@ class TestThreadLocalState(PecanTestCase):
         app = TestApp(Pecan(RootController()))
         r = app.get('/')
         assert r.status_int == 200
-        assert r.body == b_('/')
+        assert r.body == b'/'
 
         assert state.__dict__ == {}
 
@@ -1418,25 +1409,25 @@ class TestFileTypeExtensions(PecanTestCase):
         for path in ('/index.html', '/index.html/'):
             r = self.app_.get(path)
             assert r.status_int == 200
-            assert r.body == b_('.html')
+            assert r.body == b'.html'
 
     def test_image_extension(self):
         for path in ('/index.png', '/index.png/'):
             r = self.app_.get(path)
             assert r.status_int == 200
-            assert r.body == b_('.png')
+            assert r.body == b'.png'
 
     def test_hidden_file(self):
         for path in ('/.vimrc', '/.vimrc/'):
             r = self.app_.get(path)
             assert r.status_int == 204
-            assert r.body == b_('')
+            assert r.body == b''
 
     def test_multi_dot_extension(self):
         for path in ('/gradient.min.js', '/gradient.min.js/'):
             r = self.app_.get(path)
             assert r.status_int == 200
-            assert r.body == b_('.js')
+            assert r.body == b'.js'
 
     def test_bad_content_type(self):
         class RootController(object):
@@ -1447,11 +1438,11 @@ class TestFileTypeExtensions(PecanTestCase):
         app = TestApp(Pecan(RootController()))
         r = app.get('/')
         assert r.status_int == 200
-        assert r.body == b_('/')
+        assert r.body == b'/'
 
         r = app.get('/index.html', expect_errors=True)
         assert r.status_int == 200
-        assert r.body == b_('/')
+        assert r.body == b'/'
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -1470,7 +1461,7 @@ class TestFileTypeExtensions(PecanTestCase):
 
         r = app.get('/example:x.tiny')
         assert r.status_int == 200
-        assert r.body == b_('SOME VALUE')
+        assert r.body == b'SOME VALUE'
 
     def test_guessing_disabled(self):
         class RootController(object):
@@ -1485,7 +1476,7 @@ class TestFileTypeExtensions(PecanTestCase):
 
         r = app.get('/index.html')
         assert r.status_int == 200
-        assert r.body == b_('SOME VALUE')
+        assert r.body == b'SOME VALUE'
 
     def test_content_type_guessing_disabled(self):
 
@@ -1617,12 +1608,12 @@ class TestCanonicalRouting(PecanTestCase):
     def test_root(self):
         r = self.app_.get('/')
         assert r.status_int == 200
-        assert b_('index') in r.body
+        assert b'index' in r.body
 
     def test_index(self):
         r = self.app_.get('/index')
         assert r.status_int == 200
-        assert b_('index') in r.body
+        assert b'index' in r.body
 
     def test_broken_clients(self):
         # for broken clients
@@ -1633,7 +1624,7 @@ class TestCanonicalRouting(PecanTestCase):
     def test_sub_controller_with_trailing(self):
         r = self.app_.get('/sub/')
         assert r.status_int == 200
-        assert b_('subindex') in r.body
+        assert b'subindex' in r.body
 
     def test_sub_controller_redirect(self):
         r = self.app_.get('/sub', status=302)
@@ -1656,17 +1647,17 @@ class TestCanonicalRouting(PecanTestCase):
     def test_with_args(self):
         r = self.app_.get('/arg/index/foo')
         assert r.status_int == 200
-        assert r.body == b_('foo')
+        assert r.body == b'foo'
 
     def test_accept_noncanonical(self):
         r = self.app_.get('/accept/')
         assert r.status_int == 200
-        assert r.body == b_('accept')
+        assert r.body == b'accept'
 
     def test_accept_noncanonical_no_trailing_slash(self):
         r = self.app_.get('/accept')
         assert r.status_int == 200
-        assert r.body == b_('accept')
+        assert r.body == b'accept'
 
 
 class TestNonCanonical(PecanTestCase):
@@ -1703,22 +1694,22 @@ class TestNonCanonical(PecanTestCase):
     def test_index(self):
         r = self.app_.get('/')
         assert r.status_int == 200
-        assert b_('index') in r.body
+        assert b'index' in r.body
 
     def test_subcontroller(self):
         r = self.app_.get('/sub')
         assert r.status_int == 200
-        assert b_('subindex') in r.body
+        assert b'subindex' in r.body
 
     def test_subcontroller_with_kwargs(self):
         r = self.app_.post('/sub', dict(foo=1))
         assert r.status_int == 200
-        assert b_('subindex') in r.body
+        assert b'subindex' in r.body
 
     def test_sub_controller_with_trailing(self):
         r = self.app_.get('/sub/')
         assert r.status_int == 200
-        assert b_('subindex') in r.body
+        assert b'subindex' in r.body
 
     def test_proxy(self):
         class RootController(object):
@@ -1829,11 +1820,11 @@ class TestEngines(PecanTestCase):
         )
         r = app.get('/')
         assert r.status_int == 200
-        assert b_("<h1>Hello, Jonathan!</h1>") in r.body
+        assert b"<h1>Hello, Jonathan!</h1>" in r.body
 
         r = app.get('/index.html?name=World')
         assert r.status_int == 200
-        assert b_("<h1>Hello, World!</h1>") in r.body
+        assert b"<h1>Hello, World!</h1>" in r.body
 
         error_msg = None
         try:
@@ -1858,11 +1849,11 @@ class TestEngines(PecanTestCase):
         )
         r = app.get('/')
         assert r.status_int == 200
-        assert b_("<h1>Hello, Jonathan!</h1>") in r.body
+        assert b"<h1>Hello, Jonathan!</h1>" in r.body
 
         r = app.get('/index.html?name=World')
         assert r.status_int == 200
-        assert b_("<h1>Hello, World!</h1>") in r.body
+        assert b"<h1>Hello, World!</h1>" in r.body
 
     @unittest.skipIf('jinja' not in builtin_renderers, 'Jinja not installed')
     def test_jinja(self):
@@ -1881,7 +1872,7 @@ class TestEngines(PecanTestCase):
         )
         r = app.get('/')
         assert r.status_int == 200
-        assert b_("<h1>Hello, Jonathan!</h1>") in r.body
+        assert b"<h1>Hello, Jonathan!</h1>" in r.body
 
         error_msg = None
         try:
@@ -1910,11 +1901,11 @@ class TestEngines(PecanTestCase):
         )
         r = app.get('/')
         assert r.status_int == 200
-        assert b_("<h1>Hello, Jonathan!</h1>") in r.body
+        assert b"<h1>Hello, Jonathan!</h1>" in r.body
 
         r = app.get('/index.html?name=World')
         assert r.status_int == 200
-        assert b_("<h1>Hello, World!</h1>") in r.body
+        assert b"<h1>Hello, World!</h1>" in r.body
 
         error_msg = None
         try:
@@ -1984,11 +1975,11 @@ class TestEngines(PecanTestCase):
         ))
         r = app.get('/')
         assert r.status_int == 200
-        assert b_("<h1>Hello, eoJ!</h1>") in r.body
+        assert b"<h1>Hello, eoJ!</h1>" in r.body
 
         r = app.get('/index.html?name=Tim')
         assert r.status_int == 200
-        assert b_("<h1>Hello, miT!</h1>") in r.body
+        assert b"<h1>Hello, miT!</h1>" in r.body
 
     def test_override_template(self):
         class RootController(object):
@@ -2000,7 +1991,7 @@ class TestEngines(PecanTestCase):
         app = TestApp(Pecan(RootController()))
         r = app.get('/')
         assert r.status_int == 200
-        assert b_('Override') in r.body
+        assert b'Override' in r.body
         assert r.content_type == 'text/plain'
 
     def test_render(self):
@@ -2014,7 +2005,7 @@ class TestEngines(PecanTestCase):
         )
         r = app.get('/')
         assert r.status_int == 200
-        assert b_("<h1>Hello, Jonathan!</h1>") in r.body
+        assert b"<h1>Hello, Jonathan!</h1>" in r.body
 
     def test_default_json_renderer(self):
 
@@ -2039,7 +2030,7 @@ class TestEngines(PecanTestCase):
         app = TestApp(Pecan(RootController(), default_renderer='json'))
         r = app.get('/')
         assert r.status_int == 200
-        assert r.body == b_("Bill")
+        assert r.body == b"Bill"
 
 
 class TestDeprecatedRouteMethod(PecanTestCase):
@@ -2063,7 +2054,7 @@ class TestDeprecatedRouteMethod(PecanTestCase):
             warnings.simplefilter("ignore")
             r = self.app_.get('/foo/bar/')
             assert r.status_int == 200
-            assert b_('foo, bar') in r.body
+            assert b'foo, bar' in r.body
 
 
 class TestExplicitRoute(PecanTestCase):
@@ -2080,7 +2071,7 @@ class TestExplicitRoute(PecanTestCase):
 
         r = app.get('/some-path/')
         assert r.status_int == 200
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
         r = app.get('/some_path/', expect_errors=True)
         assert r.status_int == 404
@@ -2102,7 +2093,7 @@ class TestExplicitRoute(PecanTestCase):
 
         r = app.get('/some-controller/some-path/')
         assert r.status_int == 200
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
         r = app.get('/some-controller/some_path/', expect_errors=True)
         assert r.status_int == 404
@@ -2138,11 +2129,11 @@ class TestExplicitRoute(PecanTestCase):
 
         r = app.get('/some-path/')
         assert r.status_int == 200
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
         r = app.get('/')
         assert r.status_int == 200
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
         r = app.get('/index/', expect_errors=True)
         assert r.status_int == 404
@@ -2204,10 +2195,10 @@ class TestExplicitRoute(PecanTestCase):
         app = TestApp(Pecan(RootController()))
 
         r = app.get('/testing/')
-        assert r.body == b_('/testing/')
+        assert r.body == b'/testing/'
 
         r = app.get('/child/testing/')
-        assert r.body == b_('/child/testing/')
+        assert r.body == b'/child/testing/'
 
     def test_custom_route_prohibited_on_lookup(self):
         try:
@@ -2267,14 +2258,14 @@ class TestExplicitRoute(PecanTestCase):
 
         r = app.get('/some-path/')
         assert r.status_int == 200
-        assert r.body == b_('Hello, World!')
+        assert r.body == b'Hello, World!'
 
         r = app.get('/foo/', expect_errors=True)
         assert r.status_int == 404
 
         r = app.post('/some-path/')
         assert r.status_int == 200
-        assert r.body == b_('POST!')
+        assert r.body == b'POST!'
 
         r = app.post('/foo/', expect_errors=True)
         assert r.status_int == 404

@@ -1,8 +1,8 @@
+import builtins
 import types
 import sys
 from inspect import getmembers
 
-import six
 from webob.exc import HTTPFound
 
 from .util import iscontroller, _cfg
@@ -15,7 +15,7 @@ __all__ = [
 
 def walk_controller(root_class, controller, hooks, seen=None):
     seen = seen or set()
-    if type(controller) not in vars(six.moves.builtins).values():
+    if type(controller) not in vars(builtins).values():
         # Avoid recursion loops
         try:
             if controller in seen:

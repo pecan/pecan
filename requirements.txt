@@ -1,5 +1,4 @@
 WebOb>=1.8
 Mako>=0.4.0
 setuptools
-six
 logutils>=0.3

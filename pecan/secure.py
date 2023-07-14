@@ -2,17 +2,11 @@ from functools import wraps
 from inspect import getmembers, isfunction
 from webob import exc
 
-import six
-
+from .compat import is_bound_method as ismethod
 from .decorators import expose
 from .util import _cfg, iscontroller
 
 __all__ = ['unlocked', 'secure', 'SecureController']
-
-if six.PY3:
-    from .compat import is_bound_method as ismethod
-else:
-    from inspect import ismethod
 
 
 class _SecureState(object):
@@ -66,7 +60,7 @@ class _SecuredAttribute(object):
         self._parent = None
 
     def _check_permissions(self):
-        if isinstance(self.check_permissions, six.string_types):
+        if isinstance(self.check_permissions, str):
             return getattr(self.parent, self.check_permissions)()
         else:
             return self.check_permissions()
@@ -76,7 +70,7 @@ class _SecuredAttribute(object):
 
     def __set_parent(self, parent):
         if ismethod(parent):
-            self._parent = six.get_method_self(parent)
+            self._parent = parent.__self__
         else:
             self._parent = parent
     parent = property(__get_parent, __set_parent)
@@ -92,7 +86,7 @@ def _allowed_check_permissions_types(x):
     return (
         ismethod(x) or
         isfunction(x) or
-        isinstance(x, six.string_types)
+        isinstance(x, str)
     )
 
 
@@ -145,7 +139,7 @@ class SecureControllerMeta(type):
         )
 
         for name, value in getmembers(cls)[:]:
-            if (isfunction if six.PY3 else ismethod)(value):
+            if isfunction(value):
                 if iscontroller(value) and value._pecan.get(
                     'secured'
                 ) is None:
@@ -207,9 +201,9 @@ def handle_security(controller, im_self=None):
     if controller._pecan.get('secured', False):
         check_permissions = controller._pecan['check_permissions']
 
-        if isinstance(check_permissions, six.string_types):
+        if isinstance(check_permissions, str):
             check_permissions = getattr(
-                im_self or six.get_method_self(controller),
+                im_self or controller.__self__,
                 check_permissions
             )
 

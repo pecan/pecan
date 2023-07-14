@@ -4,6 +4,7 @@ from json import loads
 try:
     from sqlalchemy import orm, schema, types
     from sqlalchemy.engine import create_engine
+    from sqlalchemy.orm import registry
 except ImportError:
     create_engine = None  # noqa
 
@@ -170,7 +171,7 @@ class TestJsonifySQLAlchemyGenericEncoder(PecanTestCase):
         )
         self.result_proxy.append(
             FakeRowProxy([
-                ('id', 2), ('first_name', 'Yoann'), ('last_name', 'Roman')
+                ('id', 2), ('first_name', 'Ryan'), ('last_name', 'Petrello')
             ]))
         self.row_proxy = FakeRowProxy([
             ('id', 1), ('first_name', 'Jonathan'), ('last_name', 'LaCour')
@@ -179,6 +180,7 @@ class TestJsonifySQLAlchemyGenericEncoder(PecanTestCase):
     def create_sa_proxies(self):
 
         # create the table and mapper
+        mapper_registry = registry()
         metadata = schema.MetaData()
         user_table = schema.Table(
             'user',
@@ -190,25 +192,24 @@ class TestJsonifySQLAlchemyGenericEncoder(PecanTestCase):
 
         class User(object):
             pass
-        orm.mapper(User, user_table)
+        mapper_registry.map_imperatively(User, user_table)
 
         # create the session
         engine = create_engine('sqlite:///:memory:')
         metadata.bind = engine
-        metadata.create_all()
+        metadata.create_all(metadata.bind)
         session = orm.sessionmaker(bind=engine)()
 
         # add some dummy data
-        user_table.insert().execute([
-            {'first_name': 'Jonathan', 'last_name': 'LaCour'},
-            {'first_name': 'Yoann', 'last_name': 'Roman'}
-        ])
+        session.add(User(first_name='Jonathan', last_name='LaCour'))
+        session.add(User(first_name='Ryan', last_name='Petrello'))
+        session.commit()
 
         # get the SA objects
         self.sa_object = session.query(User).first()
         select = user_table.select()
-        self.result_proxy = select.execute()
-        self.row_proxy = select.execute().fetchone()
+        self.result_proxy = session.execute(select)
+        self.row_proxy = session.execute(select).fetchone()
 
     def test_sa_object(self):
         result = encode(self.sa_object)
@@ -220,7 +221,7 @@ class TestJsonifySQLAlchemyGenericEncoder(PecanTestCase):
         result = encode(self.result_proxy)
         assert loads(result) == {'count': 2, 'rows': [
             {'id': 1, 'first_name': 'Jonathan', 'last_name': 'LaCour'},
-            {'id': 2, 'first_name': 'Yoann', 'last_name': 'Roman'}
+            {'id': 2, 'first_name': 'Ryan', 'last_name': 'Petrello'}
         ]}
 
     def test_row_proxy(self):
