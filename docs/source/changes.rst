@@ -115,7 +115,7 @@
   --reload` to avoid extraneous server reloads.
 
 1.0.1
-====
+=====
 * Fixed a bug wherein the file extension for URLs with a trailing slash
   (`file.html` vs `file.html/`) were not correctly guessed, thus resulting in
   incorrect Content-Type headers.

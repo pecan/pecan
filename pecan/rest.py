@@ -243,7 +243,7 @@ class RestController(object):
 
     def _handle_unknown_method(self, method, remainder, request=None):
         '''
-        Routes undefined actions (like RESET) to the appropriate controller.
+        Routes undefined actions (like TRACE) to the appropriate controller.
         '''
         if request is None:
             self._raise_method_deprecation_warning(self._handle_unknown_method)

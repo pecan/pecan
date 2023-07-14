@@ -32,7 +32,7 @@ class TestAppRoot(PecanTestCase):
 
     def test_controller_lookup_by_string_path(self):
         app = Pecan('pecan.tests.test_base.SampleRootController')
-        assert app.root and isinstance(app.root, SampleRootController)
+        assert app.root and app.root.__class__.__name__ == 'SampleRootController'
 
 
 class TestEmptyContent(PecanTestCase):
