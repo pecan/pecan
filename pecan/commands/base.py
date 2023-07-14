@@ -86,6 +86,9 @@ class CommandRunner(object):
 
     def run(self, args):
         ns = self.parser.parse_args(args)
+        if ns.command_name is None:
+            self.run(['--help'])
+            return
         self.commands[ns.command_name]().run(ns)
 
     @classmethod
