@@ -4,8 +4,6 @@ import re
 import pkg_resources
 from string import Template
 
-import six
-
 DEFAULT_SCAFFOLD = 'base'
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 
@@ -125,18 +123,13 @@ def render_template(content, variables):
     fsenc = sys.getfilesystemencoding()
 
     def to_native(s, encoding='latin-1', errors='strict'):
-        if six.PY3:
-            if isinstance(s, six.text_type):
-                return s
-            return str(s, encoding, errors)
-        else:
-            if isinstance(s, six.text_type):
-                return s.encode(encoding, errors)
-            return str(s)
+        if isinstance(s, str):
+            return s
+        return str(s, encoding, errors)
 
     output = Template(
         to_native(content, fsenc)
     ).substitute(variables)
-    if isinstance(output, six.text_type):
+    if isinstance(output, str):
         output = output.encode(fsenc, 'strict')
     return output

@@ -8,11 +8,16 @@ on:
 
 jobs:
   unit-tests:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-20.04"  # see: https://github.com/actions/setup-python/issues/544
+    timeout-minutes: 10
     strategy:
       matrix:
         python: [3.6, 3.7, 3.8, 3.9, "3.10"]
-        command: ["py", "scaffolds", "sqlalchemy-1.3"]
+        command: ["py", "scaffolds", "sqlalchemy-1.4", "sqlalchemy-2"]
+        exclude:
+          # SQLAlchemy2 requires >= py3.7
+          - python: 3.6
+            command: "sqlalchemy-2"
 
     steps:
       - uses: actions/checkout@v2

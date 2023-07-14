@@ -1,8 +1,6 @@
 from json import dumps
 from webtest import TestApp
 
-from six import b as b_
-
 from pecan import Pecan, expose, abort
 from pecan.tests import PecanTestCase
 
@@ -26,11 +24,11 @@ class TestGeneric(PecanTestCase):
         app = TestApp(Pecan(RootController()))
         r = app.get('/')
         assert r.status_int == 200
-        assert r.body == b_('GET')
+        assert r.body == b'GET'
 
         r = app.post('/')
         assert r.status_int == 200
-        assert r.body == b_(dumps(dict(result='POST')))
+        assert r.body == dumps(dict(result='POST')).encode('utf-8')
 
         r = app.get('/do_get', status=404)
         assert r.status_int == 404
@@ -78,11 +76,13 @@ class TestGeneric(PecanTestCase):
         app = TestApp(Pecan(RootController()))
         r = app.get('/sub/sub/')
         assert r.status_int == 200
-        assert r.body == b_('GET')
+        assert r.body == b'GET'
 
         r = app.delete('/sub/sub/joe/is/cool')
         assert r.status_int == 200
-        assert r.body == b_(dumps(dict(result='joe', args='is, cool')))
+        assert r.body == dumps(
+            dict(result='joe', args='is, cool')
+        ).encode('utf-8')
 
 
 class TestGenericWithSpecialMethods(PecanTestCase):

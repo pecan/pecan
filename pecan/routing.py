@@ -4,7 +4,6 @@ import warnings
 from inspect import getmembers, ismethod
 
 from webob import exc
-import six
 
 from .secure import handle_security, cross_boundary
 from .util import iscontroller, getargspec, _cfg
@@ -42,7 +41,7 @@ def route(*args):
     """
 
     def _validate_route(route):
-        if not isinstance(route, six.string_types):
+        if not isinstance(route, str):
             raise TypeError('%s must be a string' % route)
 
         if route in ('.', '..') or not re.match(
@@ -280,7 +279,7 @@ def _detect_custom_path_segments(obj):
         for key, val in getmembers(obj):
             if iscontroller(val) and isinstance(
                 getattr(val, 'custom_route', None),
-                six.string_types
+                str,
             ):
                 route = val.custom_route
 
