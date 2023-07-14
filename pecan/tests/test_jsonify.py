@@ -171,7 +171,7 @@ class TestJsonifySQLAlchemyGenericEncoder(PecanTestCase):
         )
         self.result_proxy.append(
             FakeRowProxy([
-                ('id', 2), ('first_name', 'Yoann'), ('last_name', 'Roman')
+                ('id', 2), ('first_name', 'Ryan'), ('last_name', 'Petrello')
             ]))
         self.row_proxy = FakeRowProxy([
             ('id', 1), ('first_name', 'Jonathan'), ('last_name', 'LaCour')

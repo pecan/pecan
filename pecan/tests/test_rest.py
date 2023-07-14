@@ -82,8 +82,8 @@ class TestRestController(PecanTestCase):
                 return 'DELETED'
 
             @expose()
-            def reset(self):
-                return 'RESET'
+            def trace(self):
+                return 'TRACE'
 
             @expose()
             def post_options(self):
@@ -194,15 +194,15 @@ class TestRestController(PecanTestCase):
         assert r.status_int == 200
         assert len(loads(r.body.decode())['items']) == 3
 
-        # test "RESET" custom action
-        r = app.request('/things', method='RESET')
+        # test "TRACE" custom action
+        r = app.request('/things', method='TRACE')
         assert r.status_int == 200
-        assert r.body == b'RESET'
+        assert r.body == b'TRACE'
 
-        # test "RESET" custom action with _method parameter
-        r = app.get('/things?_method=RESET')
+        # test "TRACE" custom action with _method parameter
+        r = app.get('/things?_method=TRACE')
         assert r.status_int == 200
-        assert r.body == b'RESET'
+        assert r.body == b'TRACE'
 
         # test the "OPTIONS" custom action
         r = app.request('/things', method='OPTIONS')
@@ -856,10 +856,10 @@ class TestRestController(PecanTestCase):
         r = app.post('/things/1?_method=DELETE', status=405)
         assert r.status_int == 405
 
-        # test "RESET" custom action
+        # test "TRACE" custom action
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            r = app.request('/things', method='RESET', status=405)
+            r = app.request('/things', method='TRACE', status=405)
             assert r.status_int == 405
 
     def test_nested_rest_with_missing_intermediate_id(self):

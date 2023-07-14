@@ -889,8 +889,8 @@ class TestRestController(PecanTestCase):
                 return 'DELETED'
 
             @expose()
-            def reset(self, req, resp):
-                return 'RESET'
+            def trace(self, req, resp):
+                return 'TRACE'
 
             @expose()
             def post_options(self, req, resp):
@@ -967,14 +967,14 @@ class TestRestController(PecanTestCase):
         assert r.body == b'DELETED'
 
     def test_custom_method_type(self):
-        r = self.app_.request('/things', method='RESET')
+        r = self.app_.request('/things', method='TRACE')
         assert r.status_int == 200
-        assert r.body == b'RESET'
+        assert r.body == b'TRACE'
 
     def test_custom_method_type_with_method_parameter(self):
-        r = self.app_.get('/things?_method=RESET')
+        r = self.app_.get('/things?_method=TRACE')
         assert r.status_int == 200
-        assert r.body == b'RESET'
+        assert r.body == b'TRACE'
 
     def test_options(self):
         r = self.app_.request('/things', method='OPTIONS')
