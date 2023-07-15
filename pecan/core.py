@@ -322,7 +322,7 @@ class PecanBase(object):
 
         :param hook_type: The type of hook, including ``before``, ``after``,
                           ``on_error``, and ``on_route``.
-        :param \*args: Arguments to pass to the hooks.
+        :param *args: Arguments to pass to the hooks.
         '''
         if hook_type not in ['before', 'on_route']:
             hooks = reversed(hooks)

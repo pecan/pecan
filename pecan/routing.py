@@ -45,7 +45,7 @@ def route(*args):
             raise TypeError('%s must be a string' % route)
 
         if route in ('.', '..') or not re.match(
-            '^[0-9a-zA-Z-_$\(\)\.~!,;:*+@=]+$', route
+            r'^[0-9a-zA-Z-_$\(\)\.~!,;:*+@=]+$', route
         ):
             raise ValueError(
                 '%s must be a valid path segment.  Keep in mind '
