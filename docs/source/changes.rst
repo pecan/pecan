@@ -1,3 +1,7 @@
+1.5.1
+=====
+* addressed an installation bug caused by a duplicate entry script (https://github.com/pecan/pecan/pull/142)
+
 1.5.0
 =====
 
