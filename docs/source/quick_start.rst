@@ -289,6 +289,11 @@ add to.  To run them::
 
     OK
 
+UPDATE :
+
+The above testing version will soon be deprecated .Hence in order to test your build securely and across all supported environments , you can run the following command ::
+    $ pip install tox && tox
+
 The tests themselves can be found in the ``tests`` module in your project.
 
 Deploying to a Web Server
