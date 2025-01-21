@@ -1,3 +1,9 @@
+1.6.0
+=====
+* resolved a bug that breaks pecan.ext in Python >= 3.12 (https://github.com/pecan/pecan/issues/157)
+* support for Python < 3.8 has been dropped.
+
+
 1.5.1
 =====
 * addressed an installation bug caused by a duplicate entry script (https://github.com/pecan/pecan/pull/142)

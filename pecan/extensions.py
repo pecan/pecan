@@ -10,7 +10,18 @@ class PecanExtensionMissing(ImportError):
     pass
 
 
-class PecanExtensionImporter(object):
+#
+# support for importlib.findloader and importlib.find_module
+# were removed in Python 3.12
+# see: https://docs.python.org/3/whatsnew/3.12.html#importlib
+#
+class FindLoaderPy312Mixin:
+
+    def find_spec(self, fullname, path, target=None):
+        return self.load_module(fullname)
+
+
+class PecanExtensionImporter(FindLoaderPy312Mixin if sys.version_info >= (3, 12) else object):
     """
     Short circuits imports for extensions.
 
