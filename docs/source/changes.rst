@@ -1,3 +1,10 @@
+1.6.0
+=====
+* remove pecan's dependency on https://pypi.org/project/logutils/, which is no
+  longer actively maintained (https://github.com/pecan/pecan/issues/159)
+  as a result, pecan's CLI will no longer print colorized log levels
+* remove support for Python 3.7 and prior
+
 1.5.1
 =====
 * addressed an installation bug caused by a duplicate entry script (https://github.com/pecan/pecan/pull/142)
