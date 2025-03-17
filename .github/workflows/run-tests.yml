@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        python: [3.6, 3.7, 3.8, 3.9, "3.10", "3.11"]
+        python: [3.8, 3.9, "3.10", "3.11"]
         command: ["py", "scaffolds", "sqlalchemy-1.4", "sqlalchemy-2"]
         exclude:
           # SQLAlchemy2 requires >= py3.7

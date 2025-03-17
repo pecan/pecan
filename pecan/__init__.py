@@ -15,10 +15,7 @@ from .configuration import set_config, Config
 from .configuration import _runtime_conf as conf
 from . import middleware
 
-try:
-    from logging.config import dictConfig as load_logging_config
-except ImportError:
-    from logutils.dictconfig import dictConfig as load_logging_config  # noqa
+from logging.config import dictConfig
 
 import warnings
 
@@ -80,7 +77,7 @@ def make_app(root, **kw):
             logging = logging.to_dict()
         if 'version' not in logging:
             logging['version'] = 1
-        load_logging_config(logging)
+        dictConfig(logging)
 
     # Instantiate the WSGI app by passing **kw onward
     app = Pecan(root, **kw)
