@@ -8,6 +8,7 @@ This code is adapted from the Werkzeug project, under the BSD license.
 import os
 import mimetypes
 from datetime import datetime
+from datetime import timezone
 from time import gmtime
 
 
@@ -115,7 +116,10 @@ class StaticFileMiddleware(object):
     def _opener(self, filename):
         return lambda: (
             open(filename, 'rb'),
-            datetime.utcfromtimestamp(os.path.getmtime(filename)),
+            datetime.fromtimestamp(
+                os.path.getmtime(filename),
+                tz=timezone.utc
+            ),
             int(os.path.getsize(filename))
         )
 
