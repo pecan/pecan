@@ -1,3 +1,8 @@
+1.7.0
+=====
+* added official support for Python 3.8 through 3.13 (https://github.com/pecan/pecan/pull/165)
+* extensions pecan imports via `pecan.ext` has been removed (https://github.com/pecan/pecan/issues/157)
+
 1.6.0
 =====
 * remove pecan's dependency on https://pypi.org/project/logutils/, which is no
