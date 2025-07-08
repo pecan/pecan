@@ -1,13 +1,9 @@
 from datetime import datetime, date
 from decimal import Decimal
+from functools import singledispatch
 from json import JSONEncoder
 
 from webob.multidict import MultiDict
-
-try:
-    from functools import singledispatch
-except ImportError:  # pragma: no cover
-    from singledispatch import singledispatch
 
 try:
     import sqlalchemy  # noqa

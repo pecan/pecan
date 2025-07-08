@@ -21,17 +21,9 @@ with open('test-requirements.txt') as reqs:
     ]
 
 try:
-    from functools import singledispatch  # noqa
+    from collections import OrderedDict
 except:
-    #
-    # This was introduced in Python 3.4 - the singledispatch package contains
-    # a backported replacement for 2.6 through 3.4
-    #
-    requirements.append('singledispatch')
-    try:
-        from collections import OrderedDict
-    except:
-        requirements.append('ordereddict')
+    requirements.append('ordereddict')
 
 
 tests_require = requirements + test_requirements
