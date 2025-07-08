@@ -32,7 +32,8 @@ class TestAppRoot(PecanTestCase):
 
     def test_controller_lookup_by_string_path(self):
         app = Pecan('pecan.tests.test_base.SampleRootController')
-        assert app.root and app.root.__class__.__name__ == 'SampleRootController'
+        assert (
+            app.root and app.root.__class__.__name__ == 'SampleRootController')
 
 
 class TestEmptyContent(PecanTestCase):
@@ -448,7 +449,7 @@ class TestControllerArguments(PecanTestCase):
             r = self.app_.get('/')
             assert r.status_int != 200  # pragma: nocover
         except Exception as ex:
-            assert type(ex) == TypeError
+            assert isinstance(ex, TypeError)
             assert ex.args[0] in (
                 "index() takes exactly 2 arguments (1 given)",
                 "index() missing 1 required positional argument: 'id'",
@@ -987,7 +988,7 @@ class TestControllerArguments(PecanTestCase):
             r = self.app_.get('/eater')
             assert r.status_int != 200  # pragma: nocover
         except Exception as ex:
-            assert type(ex) == TypeError
+            assert isinstance(ex, TypeError)
             assert ex.args[0] in (
                 "eater() takes exactly 2 arguments (1 given)",
                 "eater() missing 1 required positional argument: 'id'",
@@ -1133,7 +1134,7 @@ class TestAbort(PecanTestCase):
         try:
             try:
                 raise Exception('Bottom Exception')
-            except:
+            except Exception:
                 abort(404)
         except Exception:
             last_exc, _, last_traceback = sys.exc_info()

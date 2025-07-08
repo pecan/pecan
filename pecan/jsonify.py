@@ -116,6 +116,7 @@ class GenericJSON(JSONEncoder):
         else:
             return JSONEncoder.default(self, obj)
 
+
 _default = GenericJSON()
 
 
@@ -134,6 +135,7 @@ def jsonify(obj):
 class GenericFunctionJSON(GenericJSON):
     def default(self, obj):
         return jsonify(obj)
+
 
 _instance = GenericFunctionJSON()
 

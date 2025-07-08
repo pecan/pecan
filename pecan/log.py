@@ -8,7 +8,9 @@ class ColorFormatter(logging.Formatter):
     def __init__(self, _logging=None, colorizer=None, *a, **kw):
         logging.Formatter.__init__(self, *a, **kw)
         warn(
-            'pecan.log.ColorFormatter is no longer supported; consider an alternative library such as https://pypi.org/project/colorlog/',
+            'pecan.log.ColorFormatter is no longer supported; '
+            'consider an alternative library such as '
+            'https://pypi.org/project/colorlog/',
             DeprecationWarning
         )
 

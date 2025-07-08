@@ -1,7 +1,7 @@
 Genshi>=0.7
 gunicorn
 Jinja2
-pep8
+pycodestyle
 sqlalchemy
 uwsgi
 virtualenv

@@ -86,7 +86,7 @@ if __name__ == '__main__':
             try:
                 # just in case stdin doesn't close
                 proc.terminate()
-            except:
+            except Exception:
                 pass
 
     class TestThirdPartyServe(TestTemplateBuilds):

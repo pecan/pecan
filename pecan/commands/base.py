@@ -162,6 +162,7 @@ class BaseCommandParent(object):
         from pecan import load_app
         return load_app(self.args.config_file)
 
+
 BaseCommand = BaseCommandMeta('BaseCommand', (BaseCommandParent,), {
     '__doc__': BaseCommandParent.__doc__
 })
