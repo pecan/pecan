@@ -7,11 +7,6 @@ from pecan import expose, make_app
 from pecan.secure import secure, unlocked, SecureController
 from pecan.tests import PecanTestCase
 
-try:
-    set()
-except:
-    from sets import Set as set
-
 
 class TestSecure(PecanTestCase):
     def test_simple_secure(self):

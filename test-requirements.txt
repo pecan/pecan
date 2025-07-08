@@ -1,3 +1,4 @@
+Genshi>=0.7
 gunicorn
 Jinja2<3  # >= 3 not compatible py35
 pep8
