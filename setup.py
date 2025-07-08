@@ -1,6 +1,3 @@
-import sys
-import platform
-
 from setuptools import setup, find_packages
 
 version = '1.7.0'
@@ -20,31 +17,8 @@ with open('test-requirements.txt') as reqs:
         if (line and not line.startswith('-'))
     ]
 
-try:
-    from functools import singledispatch  # noqa
-except:
-    #
-    # This was introduced in Python 3.4 - the singledispatch package contains
-    # a backported replacement for 2.6 through 3.4
-    #
-    requirements.append('singledispatch')
-    try:
-        from collections import OrderedDict
-    except:
-        requirements.append('ordereddict')
-
-
 tests_require = requirements + test_requirements
 
-if sys.version_info < (3, 0):
-    # These don't support Python3 yet - don't run their tests
-    if platform.python_implementation() != 'PyPy':
-        # Kajiki is not pypy-compatible
-        tests_require += ['Kajiki']
-    tests_require += ['Genshi']
-else:
-    # Genshi added Python3 support in 0.7
-    tests_require += ['Genshi>=0.7']
 
 #
 # call setup

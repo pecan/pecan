@@ -23,6 +23,7 @@ class _SecureState(object):
     def __bool__(self):
         return self.__nonzero__()
 
+
 Any = _SecureState('Any', False)
 Protected = _SecureState('Protected', True)
 
