@@ -2,15 +2,7 @@ from datetime import datetime, date
 from decimal import Decimal
 from json import JSONEncoder
 
-# depending on the version WebOb might have 2 types of dicts
-try:
-    # WebOb <= 1.1.1
-    from webob.multidict import MultiDict, UnicodeMultiDict
-    webob_dicts = (MultiDict, UnicodeMultiDict)  # pragma: no cover
-except ImportError:  # pragma no cover
-    # WebOb >= 1.2
-    from webob.multidict import MultiDict
-    webob_dicts = (MultiDict,)
+from webob.multidict import MultiDict
 
 try:
     from functools import singledispatch
@@ -89,8 +81,8 @@ class GenericJSON(JSONEncoder):
             Casts the RowProxy cursor object into a dictionary, probably
             losing its ordered dictionary behavior in the process but
             making it JSON-friendly.
-        * webob_dicts objects
-            returns webob_dicts.mixed() dictionary, which is guaranteed
+        * webob.multidict.MultiDict objects
+            returns MultiDict.mixed() dictionary, which is guaranteed
             to be JSON-friendly.
         '''
         if hasattr(obj, '__json__') and callable(obj.__json__):
@@ -123,7 +115,7 @@ class GenericJSON(JSONEncoder):
                 # SQLAlchemy 2.0 support
                 obj = obj._mapping
             return dict(obj)
-        elif isinstance(obj, webob_dicts):
+        elif isinstance(obj, MultiDict):
             return obj.mixed()
         else:
             return JSONEncoder.default(self, obj)
