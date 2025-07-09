@@ -15,6 +15,7 @@ from .configuration import set_config, Config
 from .configuration import _runtime_conf as conf
 from . import middleware
 
+from logging import captureWarnings
 from logging.config import dictConfig
 
 import warnings
@@ -60,18 +61,8 @@ def make_app(root, **kw):
     debug = kw.get('debug', False)
     if logging:
         if debug:
-            try:
-                #
-                # By default, Python 2.7+ silences DeprecationWarnings.
-                # However, if conf.app.debug is True, we should probably ensure
-                # that users see these types of warnings.
-                #
-                from logging import captureWarnings
-                captureWarnings(True)
-                warnings.simplefilter("default", DeprecationWarning)
-            except ImportError:
-                # No captureWarnings on Python 2.6, DeprecationWarnings are on
-                pass
+            captureWarnings(True)
+            warnings.simplefilter("default", DeprecationWarning)
 
         if isinstance(logging, Config):
             logging = logging.to_dict()
