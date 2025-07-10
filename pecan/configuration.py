@@ -40,9 +40,10 @@ class Config(object):
     :param filename: A filename to use for the configuration.
     '''
 
-    def __init__(self, conf_dict={}, filename=''):
+    def __init__(self, conf_dict=None, filename=''):
         self.__values__ = {}
         self.__file__ = filename
+        conf_dict = conf_dict or {}
         self.update(conf_dict)
 
     def empty(self):

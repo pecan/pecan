@@ -29,12 +29,12 @@ logger = logging.getLogger(__name__)
 
 class RoutingState(object):
 
-    def __init__(self, request, response, app, hooks=[], controller=None,
+    def __init__(self, request, response, app, hooks=None, controller=None,
                  arguments=None):
         self.request = request
         self.response = response
         self.app = app
-        self.hooks = hooks
+        self.hooks = hooks or []
         self.controller = controller
         self.arguments = arguments
 
@@ -130,7 +130,7 @@ def abort(status_code, detail='', headers=None, comment=None, **kw):
         del traceback
 
 
-def redirect(location=None, internal=False, code=None, headers={},
+def redirect(location=None, internal=False, code=None, headers=None,
              add_slash=False, request=None):
     '''
     Perform a redirect, either internal or external. An internal redirect
@@ -221,7 +221,7 @@ class PecanBase(object):
 
     def __init__(self, root, default_renderer='mako',
                  template_path='templates', hooks=lambda: [],
-                 custom_renderers={}, extra_template_vars={},
+                 custom_renderers=None, extra_template_vars=None,
                  force_canonical=True, guess_content_type_from_ext=True,
                  context_local_factory=None, request_cls=Request,
                  response_cls=Response, **kw):
