@@ -119,7 +119,8 @@ class ForwardRequestException(Exception):
                 raise ForwardRequestException(environ=new_environ)
     """
 
-    def __init__(self, url=None, environ={}, factory=None, path_info=None):
+    def __init__(self, url=None, environ=None, factory=None, path_info=None):
+        environ = environ or {}
         # Check no incompatible options have been chosen
         if factory and url:
             raise TypeError(
