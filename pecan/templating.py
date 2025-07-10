@@ -218,7 +218,8 @@ class ExtraNamespace(object):
 
     :param extras: dictionary of extra parameters. Defaults to an empty dict.
     '''
-    def __init__(self, extras={}):
+    def __init__(self, extras=None):
+        extras = extras or {}
         self.namespace = dict(extras)
 
     def update(self, d):
@@ -250,10 +251,10 @@ class RendererFactory(object):
     :param custom_renderers: custom-defined renderers to manufacture
     :param extra_vars: extra vars for the template namespace
     '''
-    def __init__(self, custom_renderers={}, extra_vars={}):
+    def __init__(self, custom_renderers=None, extra_vars=None):
         self._renderers = {}
         self._renderer_classes = dict(_builtin_renderers)
-        self.add_renderers(custom_renderers)
+        self.add_renderers(custom_renderers or {})
         self.extra_vars = ExtraNamespace(extra_vars)
 
     def add_renderers(self, custom_dict):
