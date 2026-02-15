@@ -1,7 +1,7 @@
 import sys
+import importlib.resources
 import os
 import re
-import pkg_resources
 from string import Template
 
 DEFAULT_SCAFFOLD = 'base'
@@ -19,7 +19,7 @@ class PecanScaffold(object):
 
     ...where...
 
-        pkg_resources.resource_listdir(_scaffold_dir[0], _scaffold_dir[1]))
+        importlib.resources.files(_scaffold_dir[0]).joinpath(_scaffold_dir[1])
 
     ...points to some scaffold directory root.
     """
@@ -63,7 +63,6 @@ def copy_dir(source, dest, variables, out_=sys.stdout, i=0):
         out_.write('\n')
         out_.flush()
 
-    names = sorted(pkg_resources.resource_listdir(source[0], source[1]))
     if not os.path.exists(dest):
         out('Creating %s' % dest)
         makedirs(dest)
@@ -71,22 +70,25 @@ def copy_dir(source, dest, variables, out_=sys.stdout, i=0):
         out('%s already exists' % dest)
         return
 
-    for name in names:
+    data_dir = importlib.resources.files(source[0])
+    for path in data_dir.joinpath(source[1]).iterdir():
 
-        full = '/'.join([source[1], name])
-        dest_full = os.path.join(dest, substitute_filename(name, variables))
+        full = os.path.join(source[1], path.name)
+        dest_full = os.path.join(
+            dest, substitute_filename(path.name, variables))
 
         sub_file = False
         if dest_full.endswith('_tmpl'):
             dest_full = dest_full[:-5]
             sub_file = True
 
-        if pkg_resources.resource_isdir(source[0], full):
+        if (data_dir.joinpath(full)).is_dir():
             out('Recursing into %s' % os.path.basename(full))
             copy_dir((source[0], full), dest_full, variables, out_, i + 1)
             continue
         else:
-            content = pkg_resources.resource_string(source[0], full)
+            content = importlib.resources.files(source[0]).joinpath(full)\
+                .read_bytes()
 
         if sub_file:
             content = render_template(content, variables)

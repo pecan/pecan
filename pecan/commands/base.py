@@ -1,5 +1,5 @@
-import pkg_resources
 import argparse
+import importlib.metadata
 import logging
 import sys
 from warnings import warn
@@ -31,7 +31,7 @@ class CommandManager(object):
         self.load_commands()
 
     def load_commands(self):
-        for ep in pkg_resources.iter_entry_points('pecan.command'):
+        for ep in importlib.metadata.entry_points(group='pecan.command'):
             log.debug('%s loading plugin %s', self.__class__.__name__, ep)
             if ep.name in self.commands:
                 warn(
@@ -98,7 +98,7 @@ class CommandRunner(object):
 
     @property
     def version(self):
-        return pkg_resources.get_distribution('pecan').version
+        return importlib.metadata.version('pecan')
 
     @property
     def commands(self):
