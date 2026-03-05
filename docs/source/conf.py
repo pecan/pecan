@@ -11,10 +11,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import pkg_resources
-
-import sys
+import importlib.metadata
 import os
+import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -59,8 +58,7 @@ copyright = u'2010, Jonathan LaCour'
 # built documents.
 #
 # The short X.Y version.
-dist = pkg_resources.get_distribution('pecan')
-version = release = dist.version
+version = release = importlib.metadata.version('pecan')
 # The full version, including alpha/beta/rc tags.
 #release = '0.3.0'
 
