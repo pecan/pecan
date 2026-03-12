@@ -1,7 +1,7 @@
 """
 Create command for Pecan
 """
-import pkg_resources
+import importlib.metadata
 import logging
 from warnings import warn
 from pecan.commands import BaseCommand
@@ -18,7 +18,7 @@ class ScaffoldManager(object):
         self.load_scaffolds()
 
     def load_scaffolds(self):
-        for ep in pkg_resources.iter_entry_points('pecan.scaffold'):
+        for ep in importlib.metadata.entry_points(group='pecan.scaffold'):
             log.debug('%s loading scaffold %s', self.__class__.__name__, ep)
             try:
                 cmd = ep.load()

@@ -183,9 +183,9 @@
 * Changed pecan to more gracefully handle a few odd request encoding edge
   cases.  Now pecan applications respond with an HTTP 400 (rather than an
   uncaught UnicodeDecodeError, resulting in an HTTP 500) when:
-    - HTTP POST requests are composed of non-Unicode data
-    - Request paths contain invalid percent-encoded characters, e.g.,
-      ``/some/path/%aa/``
+  - HTTP POST requests are composed of non-Unicode data
+  - Request paths contain invalid percent-encoded characters, e.g.,
+    ``/some/path/%aa/``
 * Improved verbosity for import-related errors in pecan configuration files,
   especially those involving relative imports.
 
