@@ -1,3 +1,8 @@
+1.8.0
+=====
+* replaced deprecated pkg_resources with importlib.metadata and importlib.resources (https://github.com/pecan/pecan/pull/171)
+* minimum Python version is now 3.10; removed support for Python 3.8 and 3.9 (https://github.com/pecan/pecan/pull/171)
+
 1.7.0
 =====
 * added official support for Python 3.8 through 3.13 (https://github.com/pecan/pecan/pull/165)
